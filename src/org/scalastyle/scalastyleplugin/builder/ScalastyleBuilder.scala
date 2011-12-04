@@ -19,6 +19,9 @@ import scala.collection.mutable.ListBuffer
 import org.scalastyle.scalastyleplugin.ScalastylePlugin
 import org.scalastyle.scalastyleplugin.ScalastylePluginException
 import org.scalastyle.scalastyleplugin.nature.ScalastyleNature
+import org.segl.scalastyle.ScalastyleConfiguration
+import org.segl.scalastyle.TextOutput
+import org.segl.scalastyle.ScalastyleChecker
 
 object ScalastyleBuilder {
   /** Eclipse extension point ID for the builder. */
@@ -64,7 +67,7 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
 
     if (ScalastyleNature.hasCorrectBuilderOrder(project)) {
       val resourceDelta = getDelta(project);
-      val filters = Array[IFilter](new IFilter{})
+      val filters = Array[IFilter](new IFilter {})
       val files = if (resourceDelta != null) getDeltaFiles(resourceDelta, filters) else getProjectFiles(project, filters)
       handleBuildSelection(files, monitor, project, kind);
     } else {
@@ -83,7 +86,16 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
     }
 
     try {
-      System.out.println("build something here resources=" + resources.toList);
+      println("build something here resources=" + resources.toList)
+      val configuration = ScalastyleConfiguration.readFromXml("c:/code/scalastyle/scalastyle/src/main/resources/scalastyle_config.xml")
+
+      val messages = new ScalastyleChecker().checkFiles2(configuration, resources.map(f => {
+        println("f=" + f.getLocation()); f.getLocation().toFile()
+      }).toList)
+
+//  new XmlOutput().output(messages);
+    new TextOutput().output(messages);
+
     } catch {
       case e: ScalastylePluginException => {
         val status = new Status(IStatus.ERROR, ScalastylePlugin.PLUGIN_ID, IStatus.ERROR, e.getLocalizedMessage(), e)
@@ -92,7 +104,7 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
       // TODO case _ => throw new CoreException(e)
     }
   }
-  
+
   def isDeltaAddedOrChanged(delta: IResourceDelta) = (delta.getKind() == IResourceDelta.ADDED) || (delta.getKind() == IResourceDelta.CHANGED)
 
   private[this] def accept(resource: IResource, filter: IFilter): Boolean = !filter.isEnabled() || filter.accept(resource)
@@ -102,18 +114,15 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
     delta.getAffectedChildren().filter(isDeltaAddedOrChanged).map(_.getResource()).flatMap(traverse(_, filters)).flatten
   }
 
-  private[this] def getProjectFiles(project: IProject, filters: Array[IFilter]): Array[IResource] = {
-    traverse(project, filters).flatten
-  }
+  private[this] def getProjectFiles(project: IProject, filters: Array[IFilter]): Array[IResource] = traverse(project, filters).flatten
 
   private[this] def traverse(resource: IResource, filters: Array[IFilter]): Array[Option[IResource]] = {
-      resource match {
-        case c: IContainer => c.members().flatMap(m => traverse(m, filters))
-        case r: IResource => Array(if (accept(r, filters)) Some(r) else None)
-        case _ => Array()
-      }
+    resource match {
+      case c: IContainer => c.members().flatMap(m => traverse(m, filters))
+      case r: IResource => Array(if (accept(r, filters)) Some(r) else None)
+      case _ => Array()
+    }
   }
-
 }
 
 trait IFilter {

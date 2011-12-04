@@ -16,6 +16,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.workbench.texteditor,
  org.eclipse.ui.editors,
  org.eclipse.team.cvs.core,
- org.eclipse.team.core
+ org.eclipse.team.core,
+ scalastyle-plugin-deps;bundle-version="1.0.0";visibility:=reexport
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: lib/scalariform_2.9.1-0.1.1.jar,
+ lib/scalastyle-0.0.1.jar,
+ .
