@@ -16,12 +16,18 @@ import org.eclipse.core.runtime.Status
 import org.eclipse.osgi.util.NLS
 import org.eclipse.ui.texteditor.MarkerUtilities
 import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.HashMap
 import org.scalastyle.scalastyleplugin.ScalastylePlugin
 import org.scalastyle.scalastyleplugin.ScalastylePluginException
 import org.scalastyle.scalastyleplugin.nature.ScalastyleNature
 import org.segl.scalastyle.ScalastyleConfiguration
 import org.segl.scalastyle.TextOutput
 import org.segl.scalastyle.ScalastyleChecker
+import org.segl.scalastyle._
+import scala.collection.JavaConversions._
+
+class EclipseFileSpec(val name: String, val resource: IResource) extends FileSpec {
+}
 
 object ScalastyleBuilder {
   /** Eclipse extension point ID for the builder. */
@@ -89,12 +95,12 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
       println("build something here resources=" + resources.toList)
       val configuration = ScalastyleConfiguration.readFromXml("c:/code/scalastyle/scalastyle/src/main/resources/scalastyle_config.xml")
 
-      val messages = new ScalastyleChecker().checkFiles2(configuration, resources.map(f => {
-        println("f=" + f.getLocation()); f.getLocation().toFile()
+      val messages = new ScalastyleChecker[EclipseFileSpec]().checkFiles(configuration, resources.map(r => {
+        println("r=" + r.getLocation()); new EclipseFileSpec(r.getLocation().toFile().getAbsolutePath(), r)
       }).toList)
 
-//  new XmlOutput().output(messages);
-    new TextOutput().output(messages);
+      //  new XmlOutput().output(messages);
+      new EclipseOutput().output(messages);
 
     } catch {
       case e: ScalastylePluginException => {
@@ -128,4 +134,50 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
 trait IFilter {
   def isEnabled() = true
   def accept(resource: IResource) = "scala" == resource.getFileExtension()
+}
+
+class EclipseOutput extends Output[EclipseFileSpec] {
+
+  override def output(messages: List[Message[EclipseFileSpec]]) = messages.foreach(message)
+
+  private def message(m: Message[EclipseFileSpec]) = m match {
+    case StartWork() => {}
+    case EndWork() => {}
+    case StartFile(file) => {}
+    case EndFile(file) => {}
+    case error: StyleError[EclipseFileSpec] => addError(error)
+    case StyleException(file, message, stacktrace, line, column) => {
+      // TODO exception please
+    }
+  }
+
+  private def addError(error: StyleError[EclipseFileSpec]): Unit = {
+    println("error file=" + error.fileSpec.name + " key=" + error.key + " lineNumber=" + error.lineNumber + " column=" + error.column + " position=" + error.position)
+    // TODO limit number of errors
+    // TODO severity level
+
+    // TODO rule metadata
+
+    try {
+      // TODO remove previous markers
+      val markerAttributes: java.util.Map[String, Any] = HashMap(ScalastyleMarker.MODULE_NAME -> "module",
+        ScalastyleMarker.MESSAGE_KEY -> error.key,
+        IMarker.PRIORITY -> IMarker.PRIORITY_NORMAL,
+        IMarker.SEVERITY -> IMarker.SEVERITY_WARNING,
+        "categoryId" -> 998)
+
+      MarkerUtilities.setLineNumber(markerAttributes, error.lineNumber.getOrElse(1));
+      MarkerUtilities.setMessage(markerAttributes, error.key);
+
+      //                        // TODO calculate offset for editor annotations
+      //                        calculateMarkerOffset(error, mMarkerAttributes);
+
+      // create a marker for the actual resource
+      MarkerUtilities.createMarker(error.fileSpec.resource, markerAttributes, ScalastyleMarker.MARKER_ID)
+    } catch {
+      case _ =>
+      // TODO log exception
+    }
+  }
+
 }
