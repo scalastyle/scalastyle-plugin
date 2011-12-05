@@ -26,8 +26,7 @@ import org.segl.scalastyle.ScalastyleChecker
 import org.segl.scalastyle._
 import scala.collection.JavaConversions._
 
-class EclipseFileSpec(val name: String, val resource: IResource) extends FileSpec {
-}
+class EclipseFileSpec(val name: String, val resource: IResource) extends FileSpec
 
 object ScalastyleBuilder {
   /** Eclipse extension point ID for the builder. */
@@ -58,13 +57,11 @@ object ScalastyleBuilder {
 }
 
 class ScalastyleBuilder extends IncrementalProjectBuilder {
-
   /**
    * @see org.eclipse.core.internal.events.InternalBuilder #build(int,
    *      java.util.Map, org.eclipse.core.runtime.IProgressMonitor)
    */
   def build(kind: Int, args: java.util.Map[_, _], monitor: IProgressMonitor): Array[IProject] = {
-
     // get the associated project for this builder
     val project = getProject();
 
@@ -152,7 +149,7 @@ class EclipseOutput extends Output[EclipseFileSpec] {
   }
 
   private def addError(error: StyleError[EclipseFileSpec]): Unit = {
-    println("error file=" + error.fileSpec.name + " key=" + error.key + " lineNumber=" + error.lineNumber + " column=" + error.column + " position=" + error.position)
+    println("error file=" + error.fileSpec.name + " key=" + error.key + " lineNumber=" + error.lineNumber + " column=" + error.column)
     // TODO limit number of errors
     // TODO severity level
 
@@ -164,7 +161,8 @@ class EclipseOutput extends Output[EclipseFileSpec] {
         ScalastyleMarker.MESSAGE_KEY -> error.key,
         IMarker.PRIORITY -> IMarker.PRIORITY_NORMAL,
         IMarker.SEVERITY -> IMarker.SEVERITY_WARNING,
-        "categoryId" -> 998)
+        "categoryId" -> 998) 
+        
 
       MarkerUtilities.setLineNumber(markerAttributes, error.lineNumber.getOrElse(1));
       MarkerUtilities.setMessage(markerAttributes, error.key);
@@ -174,6 +172,7 @@ class EclipseOutput extends Output[EclipseFileSpec] {
 
       // create a marker for the actual resource
       MarkerUtilities.createMarker(error.fileSpec.resource, markerAttributes, ScalastyleMarker.MARKER_ID)
+      
     } catch {
       case _ =>
       // TODO log exception
