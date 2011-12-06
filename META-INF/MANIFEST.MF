@@ -5,6 +5,7 @@ Bundle-SymbolicName: scalastyle-plugin; singleton:=true
 Bundle-Version: 0.0.1.qualifier
 Bundle-Activator: org.scalastyle.scalastyleplugin.ScalastylePlugin
 Bundle-Vendor: Scalastyle
+Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.scala-ide.scala.library,

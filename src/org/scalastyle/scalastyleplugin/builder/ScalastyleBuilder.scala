@@ -90,12 +90,11 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
     }
 
     try {
-      println("build something here resources=" + resources.toList)
       val projectConfiguration = ProjectConfigurations.configuration(project)
       val configuration = ScalastyleConfiguration.readFromXml(projectConfiguration.files(0))
 
       val messages = new ScalastyleChecker[EclipseFileSpec]().checkFiles(configuration, resources.map(r => {
-        println("r=" + r.getLocation()); new EclipseFileSpec(r.getLocation().toFile().getAbsolutePath(), r)
+        new EclipseFileSpec(r.getLocation().toFile().getAbsolutePath(), r)
       }).toList)
 
       //  new XmlOutput().output(messages);
