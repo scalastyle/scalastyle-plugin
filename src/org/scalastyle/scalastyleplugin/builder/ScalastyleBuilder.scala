@@ -22,6 +22,7 @@ import org.scalastyle.scalastyleplugin.ScalastylePluginException
 import org.scalastyle.scalastyleplugin.nature.ScalastyleNature
 import org.segl.scalastyle.ScalastyleConfiguration
 import org.segl.scalastyle.TextOutput
+import org.scalastyle.scalastyleplugin.config.ProjectConfigurations
 import org.segl.scalastyle.ScalastyleChecker
 import org.segl.scalastyle._
 import scala.collection.JavaConversions._
@@ -90,7 +91,8 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
 
     try {
       println("build something here resources=" + resources.toList)
-      val configuration = ScalastyleConfiguration.readFromXml("c:/code/scalastyle/scalastyle/src/main/resources/scalastyle_config.xml")
+      val projectConfiguration = ProjectConfigurations.configuration(project)
+      val configuration = ScalastyleConfiguration.readFromXml(projectConfiguration.files(0))
 
       val messages = new ScalastyleChecker[EclipseFileSpec]().checkFiles(configuration, resources.map(r => {
         println("r=" + r.getLocation()); new EclipseFileSpec(r.getLocation().toFile().getAbsolutePath(), r)
@@ -140,9 +142,16 @@ class EclipseOutput extends Output[EclipseFileSpec] {
   private def message(m: Message[EclipseFileSpec]) = m match {
     case StartWork() => {}
     case EndWork() => {}
-    case StartFile(file) => {}
+    case StartFile(file) => {
+      println("deleting markers")
+      // remove markers on this file
+      file.resource.deleteMarkers(ScalastyleMarker.MARKER_ID, false, IResource.DEPTH_ZERO);
+
+      // remove markers from package to prevent
+      file.resource.getParent().deleteMarkers(ScalastyleMarker.MARKER_ID, false, IResource.DEPTH_ZERO);
+    }
     case EndFile(file) => {}
-    case error: StyleError[EclipseFileSpec] => addError(error)
+    case error: StyleError[_] => addError(error)
     case StyleException(file, message, stacktrace, line, column) => {
       // TODO exception please
     }
@@ -156,13 +165,11 @@ class EclipseOutput extends Output[EclipseFileSpec] {
     // TODO rule metadata
 
     try {
-      // TODO remove previous markers
       val markerAttributes: java.util.Map[String, Any] = HashMap(ScalastyleMarker.MODULE_NAME -> "module",
-        ScalastyleMarker.MESSAGE_KEY -> error.key,
-        IMarker.PRIORITY -> IMarker.PRIORITY_NORMAL,
-        IMarker.SEVERITY -> IMarker.SEVERITY_WARNING,
-        "categoryId" -> 998) 
-        
+															        ScalastyleMarker.MESSAGE_KEY -> error.key,
+															        IMarker.PRIORITY -> IMarker.PRIORITY_NORMAL,
+															        IMarker.SEVERITY -> IMarker.SEVERITY_WARNING,
+															        "categoryId" -> 998)
 
       MarkerUtilities.setLineNumber(markerAttributes, error.lineNumber.getOrElse(1));
       MarkerUtilities.setMessage(markerAttributes, error.key);
@@ -172,7 +179,7 @@ class EclipseOutput extends Output[EclipseFileSpec] {
 
       // create a marker for the actual resource
       MarkerUtilities.createMarker(error.fileSpec.resource, markerAttributes, ScalastyleMarker.MARKER_ID)
-      
+
     } catch {
       case _ =>
       // TODO log exception
