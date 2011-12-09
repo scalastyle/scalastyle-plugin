@@ -21,6 +21,10 @@ object ProjectConfigurations {
         val file = project.getFile(PROJECT_CONFIGURATION_FILE);
         if (!file.exists()) {
         	// create one
+          // TODO NEXT: make this relative to the project, maybe even set config correctly in a window?
+          // relative to project, relative to workspace, standard config in the jar
+          // create project config based upon standard config(s)
+          // do we need a overall configuration thing for scalastyle, which describes what can be done?
           // TODO do we save this?, probably not yet
           ProjectConfiguration(project, List("c:/code/scalastyle/scalastyle/src/main/resources/scalastyle_config.xml"));
         } else {

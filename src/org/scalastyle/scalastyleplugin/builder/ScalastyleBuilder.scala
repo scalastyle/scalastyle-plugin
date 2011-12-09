@@ -101,11 +101,8 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
       new EclipseOutput().output(messages);
 
     } catch {
-      case e: ScalastylePluginException => {
-        val status = new Status(IStatus.ERROR, ScalastylePlugin.PLUGIN_ID, IStatus.ERROR, e.getLocalizedMessage(), e)
-        throw new CoreException(status)
-      }
-      // TODO case _ => throw new CoreException(e)
+      // TODO probably add something to the error log and marker?
+      case e: Exception => throw new CoreException(new Status(IStatus.ERROR, ScalastylePlugin.PLUGIN_ID, IStatus.ERROR, e.getLocalizedMessage(), e))
     }
   }
 
@@ -142,23 +139,22 @@ class EclipseOutput extends Output[EclipseFileSpec] {
     case StartWork() => {}
     case EndWork() => {}
     case StartFile(file) => {
-      println("deleting markers")
       // remove markers on this file
       file.resource.deleteMarkers(ScalastyleMarker.MARKER_ID, false, IResource.DEPTH_ZERO);
 
-      // remove markers from package to prevent
+      // remove markers from package as well, not sure if this is necessary
       file.resource.getParent().deleteMarkers(ScalastyleMarker.MARKER_ID, false, IResource.DEPTH_ZERO);
     }
     case EndFile(file) => {}
     case error: StyleError[_] => addError(error)
     case StyleException(file, message, stacktrace, line, column) => {
-      // TODO exception please
+      // TODO cope with StyleException please
     }
   }
 
   private def addError(error: StyleError[EclipseFileSpec]): Unit = {
     println("error file=" + error.fileSpec.name + " key=" + error.key + " lineNumber=" + error.lineNumber + " column=" + error.column)
-    // TODO limit number of errors
+    // TODO limit number of errors, do we limit number of errors and number of warnings? or both together
     // TODO severity level
 
     // TODO rule metadata
@@ -176,9 +172,8 @@ class EclipseOutput extends Output[EclipseFileSpec] {
       //                        // TODO calculate offset for editor annotations
       //                        calculateMarkerOffset(error, mMarkerAttributes);
 
-      // create a marker for the actual resource
+      // create a marker for the file
       MarkerUtilities.createMarker(error.fileSpec.resource, markerAttributes, ScalastyleMarker.MARKER_ID)
-
     } catch {
       case _ =>
       // TODO log exception

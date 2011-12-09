@@ -3,30 +3,6 @@
 <plugin>
 
    <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            label="Sample Action Set"
-            visible="true"
-            id="scalastyle-plugin.actionSet">
-         <menu
-               label="Sample &amp;Menu"
-               id="sampleMenu">
-            <separator
-                  name="sampleGroup">
-            </separator>
-         </menu>
-         <action
-               label="&amp;Sample Action"
-               icon="icons/sample.gif"
-               class="org.scalastyle.scalastyleplugin.actions.SampleAction"
-               tooltip="Hello, Eclipse world"
-               menubarPath="sampleMenu/sampleGroup"
-               toolbarPath="sampleGroup"
-               id="org.scalastyle.scalastyleplugin.actions.SampleAction">
-         </action>
-      </actionSet>
-   </extension>
-   <extension
          id="ScalastyleBuilder"
          name="%ScalastyleBuilder.name"
          point="org.eclipse.core.resources.builders">
@@ -86,5 +62,52 @@
             markerSeverity="0">
       </type>
    </extension>
+
+    <extension
+        point="org.eclipse.ui.popupMenus">
+        <objectContribution
+            objectClass="org.eclipse.core.resources.IProject"
+            adaptable="true"
+            id="org.scalastyle.scalastyleplugin.projects">
+            <menu
+                id="org.scalastyle.scalastyleplugin.menu"
+                label="%Scalastyle.menu"
+                path="additions">
+                <separator name="content">
+                </separator>
+            </menu>
+            </objectContribution>
+      <objectContribution
+            adaptable="true"
+            objectClass="org.eclipse.core.resources.IProject"
+            nameFilter="*"
+            id="org.scalastyle.scalastyleplugin.actions.object.AddScalastyleNatureAction">
+         <action
+               class="org.scalastyle.scalastyleplugin.actions.AddScalastyleNatureAction"
+               enablesFor="+"
+               id="org.scalastyle.scalastyleplugin.actions.AddScalastyleNatureAction"
+               label="%AddScalastyleNature.name"
+               menubarPath="org.scalastyle.scalastyleplugin.menu/content"
+               tooltip="Adds support for Scalastyle to a project">
+         </action>
+       
+    </objectContribution>
+      <objectContribution
+            adaptable="true"
+            objectClass="org.eclipse.core.resources.IProject"
+            nameFilter="*"
+            id="org.scalastyle.scalastyleplugin.actions.object.RemoveScalastyleNatureAction">
+         <action
+               class="org.scalastyle.scalastyleplugin.actions.RemoveScalastyleNatureAction"
+               enablesFor="+"
+               id="org.scalastyle.scalastyleplugin.actions.RemoveScalastyleNatureAction"
+               label="%RemoveScalastyleNature.name"
+               menubarPath="org.scalastyle.scalastyleplugin.menu/content"
+               tooltip="Removes support for Scalastyle from a project">
+         </action>
+       
+    </objectContribution>
+
+    </extension>    
 
 </plugin>
