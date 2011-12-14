@@ -110,4 +110,13 @@
 
     </extension>    
 
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            name="Scalastyle"
+            class="org.scalastyle.scalastyleplugin.preferences.ScalastylePreferencePage"
+            id="org.scalastyle.scalastyleplugin.preferences.ScalastylePreferencePage">
+      </page>
+   </extension>
+
 </plugin>
