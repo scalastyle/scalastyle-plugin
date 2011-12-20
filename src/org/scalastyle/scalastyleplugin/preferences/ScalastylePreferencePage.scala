@@ -40,9 +40,6 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
 
   setPreferenceStore(ScalastylePlugin.getDefault().getPreferenceStore());
 
-  /**
-   * {@inheritDoc}
-   */
   def createContents(ancestor: Composite): Control = {
     noDefaultAndApplyButton();
 
