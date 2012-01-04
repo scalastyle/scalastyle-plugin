@@ -132,7 +132,7 @@ trait IFilter {
 }
 
 class EclipseOutput extends Output[EclipseFileSpec] {
-
+  private[this] val messageHelper = new MessageHelper()
   override def output(messages: List[Message[EclipseFileSpec]]) = messages.foreach(message)
 
   private def message(m: Message[EclipseFileSpec]) = m match {
@@ -146,13 +146,13 @@ class EclipseOutput extends Output[EclipseFileSpec] {
       file.resource.getParent().deleteMarkers(ScalastyleMarker.MARKER_ID, false, IResource.DEPTH_ZERO);
     }
     case EndFile(file) => {}
-    case error: StyleError[_] => addError(error)
-    case StyleException(file, message, stacktrace, line, column) => {
+    case error: StyleError[_] => addError(messageHelper, error)
+    case StyleException(file, clazz, message, stacktrace, line, column) => {
       // TODO cope with StyleException please
     }
   }
 
-  private def addError(error: StyleError[EclipseFileSpec]): Unit = {
+  private def addError(messageHelper: MessageHelper, error: StyleError[EclipseFileSpec]): Unit = {
     println("error file=" + error.fileSpec.name + " key=" + error.key + " lineNumber=" + error.lineNumber + " column=" + error.column)
     // TODO limit number of errors, do we limit number of errors and number of warnings? or both together
     // TODO severity level
@@ -167,7 +167,7 @@ class EclipseOutput extends Output[EclipseFileSpec] {
 															        "categoryId" -> 998)
 
       MarkerUtilities.setLineNumber(markerAttributes, error.lineNumber.getOrElse(1));
-      MarkerUtilities.setMessage(markerAttributes, error.key);
+      MarkerUtilities.setMessage(markerAttributes, messageHelper.getMessage(error.clazz, error.key, error.args));
 
       //                        // TODO calculate offset for editor annotations
       //                        calculateMarkerOffset(error, mMarkerAttributes);
