@@ -17,21 +17,21 @@ object BuildProjectJob {
 }
 
 class BuildProjectJob(projects: Array[IProject], kind: Int, message: String) extends Job(message) {
-    def run(monitor: IProgressMonitor): IStatus = {
-        var status: IStatus = Status.OK_STATUS
+  def run(monitor: IProgressMonitor): IStatus = {
+    var status: IStatus = Status.OK_STATUS
 
-        try {
-          projects.foreach(project => { 
-                if (project.isOpen() && project.hasNature(ScalastyleNature.NATURE_ID)) {
-                    project.build(kind, monitor);
-                }
-          })
-        } catch {
-          case e: CoreException => status = e.getStatus()
-        } finally {
-            monitor.done();
+    try {
+      projects.foreach(project => {
+        if (project.isOpen() && project.hasNature(ScalastyleNature.NATURE_ID)) {
+          project.build(kind, monitor);
         }
-
-        status
+      })
+    } catch {
+      case e: CoreException => status = e.getStatus()
+    } finally {
+      monitor.done();
     }
+
+    status
+  }
 }

@@ -7,17 +7,17 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate
 import org.eclipse.jface.dialogs.MessageDialog
 
 class SampleAction extends IWorkbenchWindowActionDelegate {
-	private[this] var window: IWorkbenchWindow = _;
+  private[this] var window: IWorkbenchWindow = _;
 
-	def run(action: IAction): Unit = {
-		MessageDialog.openInformation(
-			window.getShell(),
-			"Scalastyle-plugin",
-			"Hello, Eclipse world");
-	}
+  def run(action: IAction): Unit = {
+    MessageDialog.openInformation(
+      window.getShell(),
+      "Scalastyle-plugin",
+      "Hello, Eclipse world");
+  }
 
-	def selectionChanged(action: IAction, selection: ISelection): Unit = {}
-	def dispose() = {}
+  def selectionChanged(action: IAction, selection: ISelection): Unit = {}
+  def dispose() = {}
 
-	def init(window: IWorkbenchWindow) = this.window = window
+  def init(window: IWorkbenchWindow) = this.window = window
 }

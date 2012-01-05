@@ -8,7 +8,7 @@ object ScalastylePlugin {
   val PLUGIN_ID = "scalastyle-plugin" //$NON-NLS-1$
   val PreferenceConfigurationFile = "preferenceConfigurationFile"
 
-  private var plugin: ScalastylePlugin = _;
+  private var plugin: ScalastylePlugin = _
 
   def getDefault(): ScalastylePlugin = plugin
 
@@ -20,12 +20,12 @@ object ScalastylePlugin {
  */
 class ScalastylePlugin extends AbstractUIPlugin {
   override def start(context: BundleContext): Unit = {
-    super.start(context);
-    ScalastylePlugin.plugin = this;
+    super.start(context)
+    ScalastylePlugin.plugin = this
   }
 
   override def stop(context: BundleContext): Unit = {
-    ScalastylePlugin.plugin = null;
-    super.stop(context);
+    ScalastylePlugin.plugin = null
+    super.stop(context)
   }
 }

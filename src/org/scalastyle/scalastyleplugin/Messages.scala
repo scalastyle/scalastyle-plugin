@@ -11,10 +11,10 @@ object Messages extends NLS {
 
   val buildAllProjects = "Building all projects"
   val buildSingleProject = "Building one project"
-    
+
   val addNatureToProjectJob = "Adding Scalastyle nature"
   val addNatureToProjectsJob = "Adding Scalastyle nature to project(s)"
-  
+
   val removeNatureFromProjectJob = "Removing Scalastyle nature"
   val removeNatureFromProjectsJob = "Removing Scalastyle nature from project(s)"
 }

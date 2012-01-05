@@ -161,10 +161,10 @@ class EclipseOutput extends Output[EclipseFileSpec] {
 
     try {
       val markerAttributes: java.util.Map[String, Any] = HashMap(ScalastyleMarker.MODULE_NAME -> "module",
-															        ScalastyleMarker.MESSAGE_KEY -> error.key,
-															        IMarker.PRIORITY -> IMarker.PRIORITY_NORMAL,
-															        IMarker.SEVERITY -> IMarker.SEVERITY_WARNING,
-															        "categoryId" -> 998)
+        ScalastyleMarker.MESSAGE_KEY -> error.key,
+        IMarker.PRIORITY -> IMarker.PRIORITY_NORMAL,
+        IMarker.SEVERITY -> IMarker.SEVERITY_WARNING,
+        "categoryId" -> 998)
 
       MarkerUtilities.setLineNumber(markerAttributes, error.lineNumber.getOrElse(1));
       MarkerUtilities.setMessage(markerAttributes, messageHelper.getMessage(error.clazz, error.key, error.args));

@@ -33,28 +33,28 @@ import org.scalastyle.scalastyleplugin.ScalastylePlugin
 
 class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferencePage {
   /** text field containing the location. */
-  var filenameText: Text = _;
+  var filenameText: Text = _
 
   /** browse button. */
-  var browseButton: Button = _;
+  var browseButton: Button = _
 
-  setPreferenceStore(ScalastylePlugin.getDefault().getPreferenceStore());
+  setPreferenceStore(ScalastylePlugin.getDefault().getPreferenceStore())
 
   def createContents(ancestor: Composite): Control = {
-    noDefaultAndApplyButton();
+    noDefaultAndApplyButton()
 
-    val parentComposite = new Composite(ancestor, SWT.NULL);
-    val layout = new FormLayout();
-    parentComposite.setLayout(layout);
+    val parentComposite = new Composite(ancestor, SWT.NULL)
+    val layout = new FormLayout()
+    parentComposite.setLayout(layout)
 
-    val generalComposite = createGeneralContents(parentComposite);
-    val fd1 = new FormData();
-    fd1.left = new FormAttachment(0);
-    fd1.top = new FormAttachment(0);
-    fd1.right = new FormAttachment(100);
-    generalComposite.setLayoutData(fd1);
+    val generalComposite = createGeneralContents(parentComposite)
+    val fd1 = new FormData()
+    fd1.left = new FormAttachment(0)
+    fd1.top = new FormAttachment(0)
+    fd1.right = new FormAttachment(100)
+    generalComposite.setLayoutData(fd1)
 
-    return parentComposite;
+    parentComposite
   }
 
   private[this] def gridLayout(columns: Int, margin: Int = 0): GridLayout = {
@@ -109,7 +109,7 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
 
     filenameText = text(configurationComposite, 500, 300, "foobar")
 
-    return generalComposite;
+    generalComposite
   }
 
   def init(workbench: IWorkbench): Unit = {}
