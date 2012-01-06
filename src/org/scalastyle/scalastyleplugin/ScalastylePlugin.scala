@@ -6,7 +6,7 @@ import org.osgi.framework.BundleContext
 
 object ScalastylePlugin {
   val PLUGIN_ID = "scalastyle-plugin" //$NON-NLS-1$
-  val PreferenceConfigurationFile = "preferenceConfigurationFile"
+  val PreferenceConfigurationFile = "scalastyle.preferenceConfigurationFile"
 
   private var plugin: ScalastylePlugin = _
 

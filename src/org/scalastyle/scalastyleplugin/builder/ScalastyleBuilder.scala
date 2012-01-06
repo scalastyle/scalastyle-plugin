@@ -90,16 +90,16 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
     }
 
     try {
-      val projectConfiguration = ProjectConfigurations.configuration(project)
-      val configuration = ScalastyleConfiguration.readFromXml(projectConfiguration.files(0))
+      val projectConfiguration = ProjectConfigurations.get(project)
+      if (projectConfiguration.files.size > 0) {
+        val configuration = ScalastyleConfiguration.readFromXml(projectConfiguration.files(0))
 
-      val messages = new ScalastyleChecker[EclipseFileSpec]().checkFiles(configuration, resources.map(r => {
-        new EclipseFileSpec(r.getLocation().toFile().getAbsolutePath(), r)
-      }).toList)
+        val messages = new ScalastyleChecker[EclipseFileSpec]().checkFiles(configuration, resources.map(r => {
+          new EclipseFileSpec(r.getLocation().toFile().getAbsolutePath(), r)
+        }).toList)
 
-      //  new XmlOutput().output(messages);
-      new EclipseOutput().output(messages);
-
+        new EclipseOutput().output(messages);
+      }
     } catch {
       // TODO probably add something to the error log and marker?
       case e: Exception => throw new CoreException(new Status(IStatus.ERROR, ScalastylePlugin.PLUGIN_ID, IStatus.ERROR, e.getLocalizedMessage(), e))

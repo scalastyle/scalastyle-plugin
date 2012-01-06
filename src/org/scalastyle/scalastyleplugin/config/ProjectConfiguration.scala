@@ -22,7 +22,14 @@ object ProjectConfigurations {
 
   val CURRENT_FILE_FORMAT_VERSION = "1";
 
-  def configuration(project: IProject): ProjectConfiguration = {
+  def save(configuration: ProjectConfiguration): Unit = {
+    val prefService = Platform.getPreferencesService();
+    val prefs = new InstanceScope().getNode(ScalastylePlugin.PLUGIN_ID);
+
+    prefs.put(ScalastylePlugin.PreferenceConfigurationFile, configuration.files(0))
+  }
+
+  def get(project: IProject): ProjectConfiguration = {
     // for the minute, we'll just use a global configuration
     val prefService = Platform.getPreferencesService();
     val prefs = new InstanceScope().getNode(ScalastylePlugin.PLUGIN_ID);

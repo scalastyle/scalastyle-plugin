@@ -1,35 +1,36 @@
 package org.scalastyle.scalastyleplugin.preferences
 
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IPreferencesService;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.osgi.service.prefs.BackingStoreException;
-
+import org.eclipse.core.runtime.Platform
+import org.eclipse.core.runtime.preferences.IEclipsePreferences
+import org.eclipse.core.runtime.preferences.IPreferencesService
+import org.eclipse.core.runtime.preferences.InstanceScope
+import org.eclipse.jface.dialogs.IDialogConstants
+import org.eclipse.jface.dialogs.MessageDialogWithToggle
+import org.eclipse.jface.preference.IPreferenceStore
+import org.eclipse.jface.preference.PreferencePage
+import org.eclipse.jface.resource.ImageDescriptor
+import org.eclipse.osgi.util.NLS
+import org.eclipse.swt.SWT
+import org.eclipse.swt.events.SelectionAdapter
+import org.eclipse.swt.events.SelectionEvent
+import org.eclipse.swt.layout.FormAttachment
+import org.eclipse.swt.layout.FormData
+import org.eclipse.swt.layout.FormLayout
+import org.eclipse.swt.layout.GridData
+import org.eclipse.swt.layout.GridLayout
+import org.eclipse.swt.widgets.Button
+import org.eclipse.swt.widgets.Combo
+import org.eclipse.swt.widgets.Composite
+import org.eclipse.swt.widgets.Control
+import org.eclipse.swt.widgets.Group
+import org.eclipse.swt.widgets.Label
+import org.eclipse.swt.widgets.Text
+import org.eclipse.ui.IWorkbench
+import org.eclipse.ui.IWorkbenchPreferencePage
+import org.osgi.service.prefs.BackingStoreException
 import org.scalastyle.scalastyleplugin.ScalastylePlugin
+import org.scalastyle.scalastyleplugin.config.ProjectConfiguration
+import org.scalastyle.scalastyleplugin.config.ProjectConfigurations
 
 class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferencePage {
   /** text field containing the location. */
@@ -101,13 +102,13 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
   def createGeneralContents(parent: Composite): Control = {
     val generalComposite = group(parent, "General", gridLayout(1, 10))
 
-    val prefs = Platform.getPreferencesService();
-
     val configurationComposite = compositeGrid(generalComposite, gridLayout(2, 10))
 
     val configurationLabel = label(configurationComposite, "Configuration (full path)")
 
-    filenameText = text(configurationComposite, 500, 300, "foobar")
+    val configuration = ProjectConfigurations.get(null)
+
+    filenameText = text(configurationComposite, 500, 300, if (configuration.files.size == 0) "" else configuration.files(0))
 
     generalComposite
   }
@@ -116,20 +117,18 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
 
   override def performOk(): Boolean = {
     try {
-      val prefService = Platform.getPreferencesService();
-      val prefs = new InstanceScope().getNode(ScalastylePlugin.PLUGIN_ID);
-
       val configurationFile = filenameText.getText();
-      prefs.put(ScalastylePlugin.PreferenceConfigurationFile, configurationFile);
+      ProjectConfigurations.save(ProjectConfiguration(null, List(configurationFile)))
 
       true
     } catch {
-      case e: Exception => {
-        // TODO log something here
-        println("caught exception")
-        e.printStackTrace(System.out)
-      }
-      false
+      case e: Exception =>
+        {
+          // TODO log something here
+          println("caught exception")
+          e.printStackTrace(System.out)
+        }
+        false
     }
   }
 }
