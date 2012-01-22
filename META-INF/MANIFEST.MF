@@ -22,7 +22,8 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/scalariform_2.9.1-0.1.1.jar,
  lib/scalastyle-0.0.1.jar,
- .
+ .,
+ bin/
 Export-Package: org.scalastyle.scalastyleplugin,
  org.scalastyle.scalastyleplugin.actions,
  org.scalastyle.scalastyleplugin.builder,

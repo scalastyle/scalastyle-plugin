@@ -12,6 +12,7 @@ import org.eclipse.jface.resource.ImageDescriptor
 import org.eclipse.osgi.util.NLS
 import org.eclipse.swt.SWT
 import org.eclipse.swt.events.SelectionAdapter
+import org.eclipse.swt.events.SelectionListener
 import org.eclipse.swt.events.SelectionEvent
 import org.eclipse.swt.layout.FormAttachment
 import org.eclipse.swt.layout.FormData
@@ -99,10 +100,22 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
     text
   }
 
+  def button(parent: Composite, text: String, fn: => Unit): Button = {
+    val button = new Button(parent, SWT.PUSH);
+    button.setText(text);
+    button.addSelectionListener(new AllListeners(fn));
+    button
+  }
+
+  class AllListeners(fn: => Unit) extends SelectionListener {
+    def widgetSelected(e: SelectionEvent): Unit = fn
+    def widgetDefaultSelected(e: SelectionEvent): Unit = {}
+  }
+
   def createGeneralContents(parent: Composite): Control = {
     val generalComposite = group(parent, "General", gridLayout(1, 10))
 
-    val configurationComposite = compositeGrid(generalComposite, gridLayout(2, 10))
+    val configurationComposite = compositeGrid(generalComposite, gridLayout(3, 10))
 
     val configurationLabel = label(configurationComposite, "Configuration (full path)")
 
@@ -110,7 +123,14 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
 
     filenameText = text(configurationComposite, 500, 300, if (configuration.files.size == 0) "" else configuration.files(0))
 
+    val editButton = button(configurationComposite, "Edit", { editConfiguration(null) })
     generalComposite
+  }
+  
+  private[this] def editConfiguration(config: String) = {
+	  val dialog = new ScalastyleConfigurationDialog(getShell(), config, ProjectConfigurations.get(null).files(0));
+	  dialog.setBlockOnOpen(true);
+	  dialog.open();
   }
 
   def init(workbench: IWorkbench): Unit = {}

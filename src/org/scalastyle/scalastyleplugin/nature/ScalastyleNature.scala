@@ -41,7 +41,7 @@ object ScalastyleNature {
       }
     })
 
-    return javaBuilderIndex < scalastyleBuilderIndex
+    javaBuilderIndex < scalastyleBuilderIndex
   }
 }
 
