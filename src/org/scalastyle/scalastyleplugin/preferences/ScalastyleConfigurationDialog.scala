@@ -30,6 +30,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
@@ -56,12 +57,33 @@ import org.eclipse.jface.viewers._
 
 case class SSTableColumn()
 
-case class ModelChecker(definitionChecker: DefinitionChecker, configurationChecker: Option[ConfigurationChecker])
+case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChecker: Option[ConfigurationChecker]) {
+  def enabled = _configurationChecker.isDefined
+  val configurationChecker = foo()
+  
+  def foo() = {
+	  var configurationChecker = _configurationChecker.getOrElse(definitionToConfiguration(definitionChecker))
+    
+	  val parameters = definitionChecker.parameters.map(dpm => {
+	      val p = configurationChecker.parameters.get(dpm._1)
+	      val value = if (p.isEmpty) dpm._2.defaultValue else p.get
+	      (dpm._1 -> value)
+	    });
+	configurationChecker.copy(parameters = parameters)    
+  }
+
+  def definitionToConfiguration(checker: DefinitionChecker): ConfigurationChecker = {
+    ConfigurationChecker(checker.className, checker.level, checker.parameters.map(m => (m._1, m._2.defaultValue)).toMap)
+  }
+}
+
 case class Model(definition: ScalastyleDefinition, configuration: ScalastyleConfiguration) {
   val list: List[ModelChecker] = definition.checkers.map(dc => ModelChecker(dc, configuration.checks.find(c => c.className == dc.className)))
   
   def checkers() = list
 }
+
+case class DialogColumn(name: String, alignment: Int, sorter: ViewerSorter, weight: Int, getText: (ModelChecker) => String)
 
 class ScalastyleConfigurationDialog(parent: Shell, config: String, file: String) extends TitleAreaDialog(parent) {
   setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX)
@@ -70,7 +92,16 @@ class ScalastyleConfigurationDialog(parent: Shell, config: String, file: String)
   val configuration = ScalastyleConfiguration.readFromXml(file)
   val model = new Model(definition, configuration)
   val messageHelper = new MessageHelper(classLoader)
-  val columns = Array()
+  // TODO fix sort
+  val columns = Array(DialogColumn("Enabled", SWT.LEFT, null, 15, { mc => if (mc.enabled) "true" else "false" }),
+      					DialogColumn("Name", SWT.LEFT, TableSorter.NameSorter, 15, { mc => messageHelper.name(mc.definitionChecker.id)}),
+      					DialogColumn("Severity", SWT.LEFT, TableSorter.SeveritySorter, 15, {mc => messageHelper.text(mc.configurationChecker.level.name)}),
+      					DialogColumn("Params", SWT.LEFT, TableSorter.ParamsSorter, 15, {mc => string(mc.configurationChecker.parameters)}),
+      					DialogColumn("Class", SWT.LEFT, TableSorter.ClassSorter, 15, {mc => mc.definitionChecker.className}),
+      					DialogColumn("Comments", SWT.LEFT, TableSorter.CommentSorter, 15, {mc => ""})
+      					)
+
+  def string(map: Map[String, String]): String = map.map(cp => cp._1 + "=" + cp._2).mkString(",")
 
   override def createDialogArea(parent: Composite): Control = {
     val composite = super.createDialogArea(parent).asInstanceOf[Composite];
@@ -85,16 +116,19 @@ class ScalastyleConfigurationDialog(parent: Shell, config: String, file: String)
     contents
   }
 
-  private[this] def textEditor(table: Table) = new TextCellEditor(table, SWT.READ_ONLY)
-  private[this] def checkboxEditor(table: Table) = new CheckboxCellEditor(table)
-
+  private[this] def textEditor(table: Table) = {
+    val te = new TextCellEditor(table)
+    te.getControl().asInstanceOf[Text].setTextLimit(60);
+    te
+  }
+  
   private[this] def configTable(parent: Composite, configuration: ScalastyleConfiguration) = {
     val group = new Group(parent, SWT.NULL)
     group.setLayout(new GridLayout())
     group.setText("Checkers")
     // TODO set width
 
-    val table = new Table(group, SWT.CHECK | SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION)
+    val table = new Table(group, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION)
     table.setLayoutData(new GridData(GridData.FILL_BOTH))
     table.setHeaderVisible(true)
     table.setLinesVisible(true)
@@ -102,31 +136,14 @@ class ScalastyleConfigurationDialog(parent: Shell, config: String, file: String)
     val tableLayout = new TableLayout()
     table.setLayout(tableLayout)
     val tableViewer = new TableViewer(table);
-
-    // Create the cell editors
-    val editors = Array[CellEditor](checkboxEditor(table), textEditor(table), textEditor(table), textEditor(table), textEditor(table))
-
-    val column1 = new TableColumn(table, SWT.NULL)
-    column1.setAlignment(SWT.CENTER)
-    column1.setText("Enabled")
-    tableLayout.addColumnData(new ColumnWeightData(10))
-
-    column(table, tableViewer, "Name", SWT.LEFT, TableSorter.NameSorter)
-    tableLayout.addColumnData(new ColumnWeightData(30))
-
-    column(table, tableViewer, "Severity", SWT.LEFT, TableSorter.LevelSorter)
-    tableLayout.addColumnData(new ColumnWeightData(15))
-
-    column(table, tableViewer, "Params", SWT.LEFT, TableSorter.ParamsSorter)
-    tableLayout.addColumnData(new ColumnWeightData(30))
-
-    column(table, tableViewer, "Class", SWT.LEFT, TableSorter.ClassNameSorter)
-    tableLayout.addColumnData(new ColumnWeightData(30))
-
-    column(table, tableViewer, "Comment", SWT.LEFT, TableSorter.CommentSorter)
-    tableLayout.addColumnData(new ColumnWeightData(30))
-
-    val f = new PropertiesLabelProvider(tableViewer, messageHelper, configuration)
+    
+    val editors: Array[CellEditor] = columns.map( c => {
+      column(table, tableViewer, c.name, c.alignment, c.sorter)
+      tableLayout.addColumnData(new ColumnWeightData(c.weight))
+      textEditor(table)
+    });
+    
+    val f = new PropertiesLabelProvider(tableViewer, messageHelper, configuration, columns)
     tableViewer.setLabelProvider(f)
     tableViewer.setContentProvider(new ArrayContentProvider())
     tableViewer.setInput(model)
@@ -154,61 +171,27 @@ class ModelContentProvider(model: Model) extends IStructuredContentProvider {
   def getElements(parent: Object): Array[java.lang.Object] = Array[java.lang.Object](model.checkers: _*)
 }
 
-class PropertiesLabelProvider(tableViewer: TableViewer, messageHelper: MessageHelper, configuration: ScalastyleConfiguration) extends LabelProvider with ITableLabelProvider with org.eclipse.jface.viewers.ICellModifier {
-  def canModify(element: java.lang.Object, property: String): Boolean = { println("modify"); true }
-
-  def modify(element: java.lang.Object, arg1: String, arg2: java.lang.Object): Unit = {
-    println("modify")
-  }
-
-  def getValue(element: Object, property: String): java.lang.Object = {
-    println("element=" + element + " property=" + property)
-    "foo"
-  }
-
-  override def getText(element: java.lang.Object): String = element.toString()
-
+class PropertiesLabelProvider(tableViewer: TableViewer, messageHelper: MessageHelper, configuration: ScalastyleConfiguration, columns: Array[DialogColumn]) extends LabelProvider with ITableLabelProvider {
   def getColumnImage(element: Any, columnIndex: Int): Image = null
 
   def getColumnText(element: java.lang.Object, columnIndex: Int): String = {
     var modelChecker = element.asInstanceOf[ModelChecker]
 
-    var configurationChecker = modelChecker.configurationChecker.getOrElse(definitionToConfiguration(modelChecker.definitionChecker))
-    
-    val parameters = modelChecker.definitionChecker.parameters.map(dpm => {
-      val p = configurationChecker.parameters.get(dpm._1)
-      val value = if (p.isEmpty) dpm._2.defaultValue else p.get
-      (dpm._1 -> value)
-    });
-    
-    configurationChecker = configurationChecker.copy(parameters = parameters)
-    
-    // TODO sorting of columns
     // TODO save the xml please
-    columnIndex match {
-      case 0 => if (configuration.checks.exists(c => (c.className == modelChecker.definitionChecker.className))) "true" else "false"
-      case 1 => messageHelper.name(modelChecker.definitionChecker.id)
-      case 2 => messageHelper.text(configurationChecker.level.name)
-      case 3 => string(configurationChecker.parameters)
-      case 4 => modelChecker.definitionChecker.className
-      case _ => ""
+    if (columnIndex >= 0 && columnIndex < columns.length) {
+      columns(columnIndex).getText(modelChecker)
+    } else {
+      ""
     }
   }
-  
-  def definitionToConfiguration(checker: DefinitionChecker): ConfigurationChecker = {
-    ConfigurationChecker(checker.className, checker.level, checker.parameters.map(m => (m._1, m._2.defaultValue)).toMap)
-  }
-
-  def string(map: Map[String, String]): String = map.map(cp => cp._1 + "=" + cp._2).mkString(",")
-  override def getImage(element: Any): Image = null
 }
 
 object TableSorter {
-  val NameSorter = TableSorter[DefinitionChecker, String](_.id)
-  val LevelSorter = TableSorter[DefinitionChecker, String](_.level.name)
-  val ClassNameSorter = TableSorter[DefinitionChecker, String](_.className)
-  val ParamsSorter = TableSorter[DefinitionChecker, String](_.parameters.toString)
-  val CommentSorter = TableSorter[DefinitionChecker, String](_.className)
+  val NameSorter = TableSorter[ModelChecker, String](_.definitionChecker.id)
+  val SeveritySorter = TableSorter[ModelChecker, String](_.definitionChecker.level.name)
+  val ClassSorter = TableSorter[ModelChecker, String](_.definitionChecker.className)
+  val ParamsSorter = TableSorter[ModelChecker, String](_.definitionChecker.parameters.toString)
+  val CommentSorter = TableSorter[ModelChecker, String](_.definitionChecker.className)
 }
 
 case class TableSorter[T, B <: java.lang.Comparable[B]](fn: (T) => B) extends ViewerSorter {
