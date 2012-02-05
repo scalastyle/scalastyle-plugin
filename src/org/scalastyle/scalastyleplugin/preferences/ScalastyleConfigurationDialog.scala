@@ -55,13 +55,11 @@ import org.eclipse.jface.viewers.IStructuredContentProvider
 import org.segl.scalastyle._
 import org.eclipse.jface.viewers._
 
-case class SSTableColumn()
-
 case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChecker: Option[ConfigurationChecker]) {
   def enabled = _configurationChecker.isDefined
-  val configurationChecker = foo()
+  val configurationChecker = copyConfigurationChecker()
   
-  def foo() = {
+  private[this] def copyConfigurationChecker() = {
 	  var configurationChecker = _configurationChecker.getOrElse(definitionToConfiguration(definitionChecker))
     
 	  val parameters = definitionChecker.parameters.map(dpm => {
@@ -92,7 +90,7 @@ class ScalastyleConfigurationDialog(parent: Shell, config: String, file: String)
   val configuration = ScalastyleConfiguration.readFromXml(file)
   val model = new Model(definition, configuration)
   val messageHelper = new MessageHelper(classLoader)
-  // TODO fix sort
+
   val columns = Array(DialogColumn("Enabled", SWT.LEFT, null, 15, { mc => if (mc.enabled) "true" else "false" }),
       					DialogColumn("Name", SWT.LEFT, TableSorter.NameSorter, 15, { mc => messageHelper.name(mc.definitionChecker.id)}),
       					DialogColumn("Severity", SWT.LEFT, TableSorter.SeveritySorter, 15, {mc => messageHelper.text(mc.configurationChecker.level.name)}),
@@ -201,14 +199,11 @@ object TableSorter {
 
 class TableSorter[T, B <: java.lang.Comparable[B]](fn: (T) => B, var asc: Boolean) extends ViewerSorter {
   def flip(): this.type = {
-    println("asc=" + asc)
     asc = !asc
     this
   }
   
   override def compare(viewer: Viewer, o1: java.lang.Object, o2: java.lang.Object): Int = {
-    val f = fn(o1.asInstanceOf[T]).compareTo(fn(o2.asInstanceOf[T])) * (if (asc) 1 else -1)
-    println("f=" + f + " asc1=" + asc)
-    f
+    fn(o1.asInstanceOf[T]).compareTo(fn(o2.asInstanceOf[T])) * (if (asc) 1 else -1)
   }
 }
