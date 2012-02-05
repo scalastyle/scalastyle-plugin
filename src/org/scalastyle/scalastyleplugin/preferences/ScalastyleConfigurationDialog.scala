@@ -83,7 +83,7 @@ case class Model(definition: ScalastyleDefinition, configuration: ScalastyleConf
   def checkers() = list
 }
 
-case class DialogColumn(name: String, alignment: Int, sorter: ViewerSorter, weight: Int, getText: (ModelChecker) => String)
+case class DialogColumn(name: String, alignment: Int, sorter: TableSorter[ModelChecker, String], weight: Int, getText: (ModelChecker) => String)
 
 class ScalastyleConfigurationDialog(parent: Shell, config: String, file: String) extends TitleAreaDialog(parent) {
   setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX)
@@ -152,13 +152,19 @@ class ScalastyleConfigurationDialog(parent: Shell, config: String, file: String)
     group
   }
 
-  private[this] def column(table: Table, tableViewer: TableViewer, text: String, alignment: Int, tableSorter: ViewerSorter): TableColumn = {
+  private[this] def column(table: Table, tableViewer: TableViewer, text: String, alignment: Int, tableSorter: TableSorter[ModelChecker, String]): TableColumn = {
     val column = new TableColumn(table, SWT.NULL)
     column.setAlignment(alignment)
     column.setText(text)
 
     column.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-      override def widgetSelected(e: SelectionEvent): Unit = tableViewer.setSorter(tableSorter)
+      override def widgetSelected(e: SelectionEvent): Unit = {
+        if (tableSorter != null) {
+          tableViewer.setSorter(tableSorter.flip())
+          // TODO check that true, true is ok
+          tableViewer.refresh(true, true)
+        }
+      }
     })
 
     column
@@ -177,7 +183,6 @@ class PropertiesLabelProvider(tableViewer: TableViewer, messageHelper: MessageHe
   def getColumnText(element: java.lang.Object, columnIndex: Int): String = {
     var modelChecker = element.asInstanceOf[ModelChecker]
 
-    // TODO save the xml please
     if (columnIndex >= 0 && columnIndex < columns.length) {
       columns(columnIndex).getText(modelChecker)
     } else {
@@ -187,16 +192,23 @@ class PropertiesLabelProvider(tableViewer: TableViewer, messageHelper: MessageHe
 }
 
 object TableSorter {
-  val NameSorter = TableSorter[ModelChecker, String](_.definitionChecker.id)
-  val SeveritySorter = TableSorter[ModelChecker, String](_.definitionChecker.level.name)
-  val ClassSorter = TableSorter[ModelChecker, String](_.definitionChecker.className)
-  val ParamsSorter = TableSorter[ModelChecker, String](_.definitionChecker.parameters.toString)
-  val CommentSorter = TableSorter[ModelChecker, String](_.definitionChecker.className)
+  val NameSorter = new TableSorter[ModelChecker, String](_.definitionChecker.id, true)
+  val SeveritySorter = new TableSorter[ModelChecker, String](_.definitionChecker.level.name, true)
+  val ClassSorter = new TableSorter[ModelChecker, String](_.definitionChecker.className, true)
+  val ParamsSorter = new TableSorter[ModelChecker, String](_.definitionChecker.parameters.toString, true)
+  val CommentSorter = new TableSorter[ModelChecker, String](_.definitionChecker.className, true)
 }
 
-case class TableSorter[T, B <: java.lang.Comparable[B]](fn: (T) => B) extends ViewerSorter {
-  // TODO including up/down
+class TableSorter[T, B <: java.lang.Comparable[B]](fn: (T) => B, var asc: Boolean) extends ViewerSorter {
+  def flip(): this.type = {
+    println("asc=" + asc)
+    asc = !asc
+    this
+  }
+  
   override def compare(viewer: Viewer, o1: java.lang.Object, o2: java.lang.Object): Int = {
-    fn(o1.asInstanceOf[T]).compareTo(fn(o2.asInstanceOf[T]))
+    val f = fn(o1.asInstanceOf[T]).compareTo(fn(o2.asInstanceOf[T])) * (if (asc) 1 else -1)
+    println("f=" + f + " asc1=" + asc)
+    f
   }
 }
