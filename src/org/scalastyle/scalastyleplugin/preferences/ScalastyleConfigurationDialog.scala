@@ -1,73 +1,33 @@
 package org.scalastyle.scalastyleplugin.preferences
 
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IPreferencesService;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.dialogs._;
 import org.eclipse.jface.viewers._;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
-import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TableLayout;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.custom.TableEditor;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.events._;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.jface.viewers.IStructuredContentProvider
-import org.segl.scalastyle._
+import org.eclipse.swt.layout._;
+import org.eclipse.swt.widgets.{List => _, _}
+import org.eclipse.jface.dialogs.Dialog;
+import org.segl.scalastyle._;
 import org.eclipse.jface.viewers._
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.window.Window;
 
 case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChecker: Option[ConfigurationChecker]) {
   def enabled = _configurationChecker.isDefined
   val configurationChecker = copyConfigurationChecker()
-  
+
   private[this] def copyConfigurationChecker() = {
-	  var configurationChecker = _configurationChecker.getOrElse(definitionToConfiguration(definitionChecker))
-    
-	  val parameters = definitionChecker.parameters.map(dpm => {
-	      val p = configurationChecker.parameters.get(dpm._1)
-	      val value = if (p.isEmpty) dpm._2.defaultValue else p.get
-	      (dpm._1 -> value)
-	    });
-	configurationChecker.copy(parameters = parameters)    
+    var configurationChecker = _configurationChecker.getOrElse(definitionToConfiguration(definitionChecker))
+
+    val parameters = definitionChecker.parameters.map(dpm => {
+      val p = configurationChecker.parameters.get(dpm._1)
+      val value = if (p.isEmpty) dpm._2.defaultValue else p.get
+      (dpm._1 -> value)
+    });
+    configurationChecker.copy(parameters = parameters)
   }
 
   def definitionToConfiguration(checker: DefinitionChecker): ConfigurationChecker = {
@@ -77,29 +37,33 @@ case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChec
 
 case class Model(definition: ScalastyleDefinition, configuration: ScalastyleConfiguration) {
   val list: List[ModelChecker] = definition.checkers.map(dc => ModelChecker(dc, configuration.checks.find(c => c.className == dc.className)))
-  
+
   def checkers() = list
 }
 
 case class DialogColumn(name: String, alignment: Int, sorter: TableSorter[ModelChecker, String], weight: Int, getText: (ModelChecker) => String)
 
 class ScalastyleConfigurationDialog(parent: Shell, config: String, file: String) extends TitleAreaDialog(parent) {
+  import ScalastyleUI._;
   setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX)
   val classLoader = this.getClass().getClassLoader()
   val definition = ScalastyleDefinition.readFromXml(classLoader.getResourceAsStream("/scalastyle_definition.xml"))
   val configuration = ScalastyleConfiguration.readFromXml(file)
   val model = new Model(definition, configuration)
   val messageHelper = new MessageHelper(classLoader)
+  var editButton: Button = _
+  var newButton: Button = _
+  var currentSelection: Option[ModelChecker] = None;
+  var tableViewer: TableViewer = _
 
-  val columns = Array(DialogColumn("Enabled", SWT.LEFT, null, 15, { mc => if (mc.enabled) "true" else "false" }),
-      					DialogColumn("Name", SWT.LEFT, TableSorter.NameSorter, 15, { mc => messageHelper.name(mc.definitionChecker.id)}),
-      					DialogColumn("Severity", SWT.LEFT, TableSorter.SeveritySorter, 15, {mc => messageHelper.text(mc.configurationChecker.level.name)}),
-      					DialogColumn("Params", SWT.LEFT, TableSorter.ParamsSorter, 15, {mc => string(mc.configurationChecker.parameters)}),
-      					DialogColumn("Class", SWT.LEFT, TableSorter.ClassSorter, 15, {mc => mc.definitionChecker.className}),
-      					DialogColumn("Comments", SWT.LEFT, TableSorter.CommentSorter, 15, {mc => ""})
-      					)
+  private[this] val columns = Array(DialogColumn("Enabled", SWT.LEFT, null, 15, { mc => if (mc.enabled) "true" else "false" }),
+    DialogColumn("Name", SWT.LEFT, TableSorter.NameSorter, 15, { mc => messageHelper.name(mc.definitionChecker.id) }),
+    DialogColumn("Severity", SWT.LEFT, TableSorter.SeveritySorter, 15, { mc => messageHelper.text(mc.configurationChecker.level.name) }),
+    DialogColumn("Params", SWT.LEFT, TableSorter.ParamsSorter, 15, { mc => string(mc.configurationChecker.parameters) }),
+    DialogColumn("Class", SWT.LEFT, TableSorter.ClassSorter, 15, { mc => mc.definitionChecker.className }),
+    DialogColumn("Comments", SWT.LEFT, TableSorter.CommentSorter, 15, { mc => "" }))
 
-  def string(map: Map[String, String]): String = map.map(cp => cp._1 + "=" + cp._2).mkString(",")
+  private[this] def string(map: Map[String, String]): String = map.map(cp => cp._1 + "=" + cp._2).mkString(",")
 
   override def createDialogArea(parent: Composite): Control = {
     val composite = super.createDialogArea(parent).asInstanceOf[Composite];
@@ -111,7 +75,29 @@ class ScalastyleConfigurationDialog(parent: Shell, config: String, file: String)
     val tableControl = configTable(contents, configuration);
     tableControl.setLayoutData(new GridData(GridData.FILL_BOTH));
 
+    editButton = button(contents, "Edit", false, { editChecker(currentSelection) })
+
     contents
+  }
+
+  private[this] def refresh() = {
+    println("refresh")
+    // TODO check that true, true is ok
+    tableViewer.refresh(true, true)
+  }
+
+  private[this] def editChecker(modelChecker: Option[ModelChecker]): Unit = {
+    println("editChecker")
+    if (modelChecker.isDefined) {
+      val dialog = new ScalastyleCheckerDialog(getShell(), modelChecker.get)
+      if (Window.OK == dialog.open()) {
+        refresh()
+      }
+    }
+  }
+
+  private[this] def setSelection(modelChecker: ModelChecker) = {
+    currentSelection = Some(modelChecker)
   }
 
   private[this] def textEditor(table: Table) = {
@@ -119,33 +105,42 @@ class ScalastyleConfigurationDialog(parent: Shell, config: String, file: String)
     te.getControl().asInstanceOf[Text].setTextLimit(60);
     te
   }
-  
+
   private[this] def configTable(parent: Composite, configuration: ScalastyleConfiguration) = {
     val group = new Group(parent, SWT.NULL)
     group.setLayout(new GridLayout())
     group.setText("Checkers")
     // TODO set width
 
-    val table = new Table(group, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION)
+    val table = new Table(group, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION)
     table.setLayoutData(new GridData(GridData.FILL_BOTH))
     table.setHeaderVisible(true)
     table.setLinesVisible(true)
 
     val tableLayout = new TableLayout()
     table.setLayout(tableLayout)
-    val tableViewer = new TableViewer(table);
-    
-    val editors: Array[CellEditor] = columns.map( c => {
+    // TODO don't assign this here
+    tableViewer = new TableViewer(table);
+
+    val editors: Array[CellEditor] = columns.map(c => {
       column(table, tableViewer, c.name, c.alignment, c.sorter)
       tableLayout.addColumnData(new ColumnWeightData(c.weight))
       textEditor(table)
     });
-    
+
     val f = new PropertiesLabelProvider(tableViewer, messageHelper, configuration, columns)
     tableViewer.setLabelProvider(f)
     tableViewer.setContentProvider(new ArrayContentProvider())
     tableViewer.setInput(model)
     tableViewer.setContentProvider(new ModelContentProvider(model))
+
+    table.addListener(SWT.Selection, new Listener() {
+      def handleEvent(event: Event) = {
+        val ss: StructuredSelection = tableViewer.getSelection().asInstanceOf[StructuredSelection];
+        editButton.setEnabled(ss != null);
+        setSelection(ss.getFirstElement().asInstanceOf[ModelChecker])
+      }
+    });
 
     group
   }
@@ -159,8 +154,7 @@ class ScalastyleConfigurationDialog(parent: Shell, config: String, file: String)
       override def widgetSelected(e: SelectionEvent): Unit = {
         if (tableSorter != null) {
           tableViewer.setSorter(tableSorter.flip())
-          // TODO check that true, true is ok
-          tableViewer.refresh(true, true)
+          refresh();
         }
       }
     })
@@ -202,7 +196,7 @@ class TableSorter[T, B <: java.lang.Comparable[B]](fn: (T) => B, var asc: Boolea
     asc = !asc
     this
   }
-  
+
   override def compare(viewer: Viewer, o1: java.lang.Object, o2: java.lang.Object): Int = {
     fn(o1.asInstanceOf[T]).compareTo(fn(o2.asInstanceOf[T])) * (if (asc) 1 else -1)
   }
