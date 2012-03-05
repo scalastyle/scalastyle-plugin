@@ -17,7 +17,15 @@ import org.eclipse.jface.window.Window;
 
 case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChecker: Option[ConfigurationChecker]) {
   def enabled = _configurationChecker.isDefined
-  val configurationChecker = copyConfigurationChecker()
+  private[this] var configurationChecker = copyConfigurationChecker()
+  var dirty = false
+  
+  def set(level: Level, parameters: Map[String, String]) = {
+    configurationChecker = configurationChecker.copy(level = level, parameters = parameters)
+    dirty = true
+  }
+  
+  def configurationChecker(): ConfigurationChecker = configurationChecker
 
   private[this] def copyConfigurationChecker() = {
     var configurationChecker = _configurationChecker.getOrElse(definitionToConfiguration(definitionChecker))
@@ -38,7 +46,15 @@ case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChec
 case class Model(definition: ScalastyleDefinition, configuration: ScalastyleConfiguration) {
   val list: List[ModelChecker] = definition.checkers.map(dc => ModelChecker(dc, configuration.checks.find(c => c.className == dc.className)))
 
-  def checkers() = list
+  def checkers = list
+  
+  def dirty = list.find(_.dirty).isDefined
+  
+  def toConfiguration: ScalastyleConfiguration = {
+    val name = configuration.name
+    val checkers = list.filter(_.enabled).map(mc => ConfigurationChecker(mc.configurationChecker.className, mc.configurationChecker.level, mc.configurationChecker.parameters))
+    ScalastyleConfiguration(name, checkers)
+  }
 }
 
 case class DialogColumn(name: String, alignment: Int, sorter: TableSorter[ModelChecker, String], weight: Int, getText: (ModelChecker) => String)
@@ -72,7 +88,7 @@ class ScalastyleConfigurationDialog(parent: Shell, config: String, file: String)
     contents.setLayoutData(new GridData(GridData.FILL_BOTH));
     contents.setLayout(new GridLayout());
 
-    val tableControl = configTable(contents, configuration);
+    val tableControl = configTable(contents, model.configuration);
     tableControl.setLayoutData(new GridData(GridData.FILL_BOTH));
 
     editButton = button(contents, "Edit", false, { editChecker(currentSelection) })
@@ -82,6 +98,7 @@ class ScalastyleConfigurationDialog(parent: Shell, config: String, file: String)
 
   private[this] def refresh() = {
     println("refresh")
+    println("eep " + currentSelection.get.configurationChecker.parameters)
     // TODO check that true, true is ok
     tableViewer.refresh(true, true)
   }
@@ -97,6 +114,7 @@ class ScalastyleConfigurationDialog(parent: Shell, config: String, file: String)
   }
 
   private[this] def setSelection(modelChecker: ModelChecker) = {
+    println("modelChecker=" + modelChecker)
     currentSelection = Some(modelChecker)
   }
 
@@ -105,6 +123,18 @@ class ScalastyleConfigurationDialog(parent: Shell, config: String, file: String)
     te.getControl().asInstanceOf[Text].setTextLimit(60);
     te
   }
+  
+  override def okPressed(): Unit = {
+    // TODO validation please
+    println("ok pressed")
+    
+    if (model.dirty) {
+      println("writing")
+      ConfigurationFile.write(file, model.toConfiguration)
+    }
+    super.okPressed();
+  }
+
 
   private[this] def configTable(parent: Composite, configuration: ScalastyleConfiguration) = {
     val group = new Group(parent, SWT.NULL)

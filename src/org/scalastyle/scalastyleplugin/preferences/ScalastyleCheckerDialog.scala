@@ -5,6 +5,7 @@ import org.eclipse.swt.widgets._;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout._;
 import org.eclipse.swt.events._;
+import org.segl.scalastyle._;
 
 class ScalastyleCheckerDialog(parent: Shell, modelChecker: ModelChecker) extends TitleAreaDialog(parent) {
   import ScalastyleUI._;
@@ -65,11 +66,17 @@ class ScalastyleCheckerDialog(parent: Shell, modelChecker: ModelChecker) extends
     
     // TODO update model here
     println("enabled=" + enabledCheckbox.getSelection())
-    println("severity=" + severityCombo.getItem(severityCombo.getSelectionIndex()))
-    parameterControls.foreach({case (name, text) => {
-       println(name + "=" + text.getText())
-    }})
-
+    val level = Level(severityCombo.getItem(severityCombo.getSelectionIndex()))
+    
+    val parameters = parameterControls.map({case (name, text) => (name, text.getText())}).toMap
+    
+    // TODO add enabled
+    val f = ConfigurationChecker(modelChecker.configurationChecker.className, level, parameters)
+    modelChecker.set(level, parameters)
+    
+    println("parameters=" + parameters)
+    println("parameters=" + modelChecker.configurationChecker.parameters)
+    
     super.okPressed()
   }
 }
