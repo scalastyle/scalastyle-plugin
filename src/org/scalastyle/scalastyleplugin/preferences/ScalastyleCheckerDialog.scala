@@ -30,10 +30,10 @@ class ScalastyleCheckerDialog(parent: Shell, modelChecker: ModelChecker) extends
     // TODO add description
 
     label(allContents, "Id")
-    text(allContents, modelChecker.definitionChecker.id, false)
+    text(allContents, modelChecker.definitionChecker.id, false, false)
 
     label(allContents, "Class")
-    text(allContents, modelChecker.configurationChecker.className, false)
+    text(allContents, modelChecker.configurationChecker.className, false, false)
 
     label(allContents, "Enabled")
     enabledCheckbox = checkbox(allContents, true)
@@ -47,7 +47,8 @@ class ScalastyleCheckerDialog(parent: Shell, modelChecker: ModelChecker) extends
       parameterControls = modelChecker.configurationChecker.parameters.map({
         case (name, value) => {
           label(parameterGroup, name)
-          (name, text(parameterGroup, value, true))
+          println("modelChecker.typeOf(name)=" + modelChecker.typeOf(name))
+          (name, text(parameterGroup, value, true, modelChecker.typeOf(name) == "multistring"))
         }
       })
     }
@@ -106,12 +107,24 @@ object ScalastyleUI {
     label
   }
 
-  def text(parent: Composite, defaultText: String, editable: Boolean): Text = {
-    val text = new Text(parent, SWT.LEFT | SWT.SINGLE | SWT.BORDER)
+  def text(parent: Composite, defaultText: String, editable: Boolean, multiLine: Boolean): Text = {
+    println("text multiLine=" + multiLine)
+    val text = new Text(parent, SWT.LEFT | (if (multiLine) SWT.MULTI else SWT.SINGLE) | SWT.BORDER)
 
     text.setEditable(editable)
     text.setText(defaultText);
-    text.setLayoutData(new GridData(GridData.FILL_BOTH))
+
+    val gridData =
+      new GridData(
+        GridData.FILL_BOTH | GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_FILL);
+//    gridData.horizontalSpan = 3;
+    if (multiLine) {
+    	gridData.heightHint = 200;
+    }
+    gridData.grabExcessVerticalSpace = true;
+
+    text.setLayoutData(gridData);
+//    text.setLayoutData(new GridData(GridData.FILL_BOTH))
 
     text
   }

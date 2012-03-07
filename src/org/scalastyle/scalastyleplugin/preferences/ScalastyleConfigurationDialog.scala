@@ -25,6 +25,10 @@ case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChec
     dirty = true
   }
   
+  def typeOf(name: String) = {
+    definitionChecker.parameters.get(name).get.typeName
+  }
+  
   def configurationChecker(): ConfigurationChecker = configurationChecker
 
   private[this] def copyConfigurationChecker() = {
