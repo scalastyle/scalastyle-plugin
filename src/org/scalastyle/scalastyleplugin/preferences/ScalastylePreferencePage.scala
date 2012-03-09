@@ -32,6 +32,19 @@ import org.osgi.service.prefs.BackingStoreException
 import org.scalastyle.scalastyleplugin.ScalastylePlugin
 import org.scalastyle.scalastyleplugin.config.ProjectConfiguration
 import org.scalastyle.scalastyleplugin.config.ProjectConfigurations
+import org.eclipse.ui.dialogs.ElementTreeSelectionDialog
+import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
+import org.eclipse.ui.dialogs.ISelectionStatusValidator;
+import org.eclipse.ui.model.WorkbenchContentProvider;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.swt.widgets.Shell
+import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
+import org.eclipse.jface.window.Window;
+import org.scalastyle.scalastyleplugin.StringUtils._
 
 class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferencePage {
   /** text field containing the location. */
@@ -115,22 +128,60 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
   def createGeneralContents(parent: Composite): Control = {
     val generalComposite = group(parent, "General", gridLayout(1, 10))
 
-    val configurationComposite = compositeGrid(generalComposite, gridLayout(3, 10))
+    val configurationComposite = compositeGrid(generalComposite, gridLayout(4, 10))
 
-    val configurationLabel = label(configurationComposite, "Configuration (full path)")
+    val configurationLabel = label(configurationComposite, "Configuration (relative to project)")
 
-    val configuration = ProjectConfigurations.get(null)
+    val configuration = ProjectConfigurations.get()
 
-    filenameText = text(configurationComposite, 500, 300, if (configuration.files.size == 0) "" else configuration.files(0))
+    filenameText = text(configurationComposite, 500, 300, configuration.file.getOrElse(""))
 
-    val editButton = button(configurationComposite, "Edit", { editConfiguration(null) })
+    val browseButton = button(configurationComposite, "Browse", {
+      browseForFile(this.getShell(), "Select a scalastyle configuration file") match {
+        case Some(file) => filenameText.setText(file.getFullPath().toString())
+        case None => 
+      }
+    })
+
+    val editButton = button(configurationComposite, "Edit", {
+      if (!isEmpty(filenameText.getText())) {
+        editConfiguration(filenameText.getText());
+      } else {
+        println("message saying must specify a file name")
+      }
+    })
+
     generalComposite
   }
-  
-  private[this] def editConfiguration(config: String) = {
-	  val dialog = new ScalastyleConfigurationDialog(getShell(), config, ProjectConfigurations.get(null).files(0));
-	  dialog.setBlockOnOpen(true);
-	  dialog.open();
+
+  private[this] def browseForFile(shell: Shell, title: String): Option[IFile] = {
+    val dialog = new ElementTreeSelectionDialog(shell, new WorkbenchLabelProvider(), new WorkbenchContentProvider());
+    dialog.setTitle(title);
+    dialog.setMessage(title);
+    dialog.setBlockOnOpen(true);
+    dialog.setAllowMultiple(false);
+    dialog.setInput(ScalastylePlugin.getWorkspace().getRoot());
+    
+    dialog.setValidator(new ISelectionStatusValidator() {
+      def validate(selection: Array[Object]): IStatus = {
+        val valid = selection.length == 1 && selection(0).isInstanceOf[IFile]
+        new Status(if (valid) IStatus.OK else IStatus.ERROR, PlatformUI.PLUGIN_ID, IStatus.ERROR, "", null)
+      }
+    });
+    
+    if (Window.OK == dialog.open()) {
+      val result = dialog.getResult();
+      val checkFile = result(0).asInstanceOf[IFile];
+      Some(checkFile)
+    } else {
+      None
+    }
+  }
+
+  private[this] def editConfiguration(file: String) = {
+    val dialog = new ScalastyleConfigurationDialog(getShell(), file);
+    dialog.setBlockOnOpen(true);
+    dialog.open();
   }
 
   def init(workbench: IWorkbench): Unit = {}
@@ -138,7 +189,7 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
   override def performOk(): Boolean = {
     try {
       val configurationFile = filenameText.getText();
-      ProjectConfigurations.save(ProjectConfiguration(null, List(configurationFile)))
+      ProjectConfigurations.save(ProjectConfiguration(toOption(configurationFile)))
 
       true
     } catch {

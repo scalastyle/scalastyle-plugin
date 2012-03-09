@@ -3,6 +3,8 @@ package org.scalastyle.scalastyleplugin
 import org.eclipse.jface.resource.ImageDescriptor
 import org.eclipse.ui.plugin.AbstractUIPlugin
 import org.osgi.framework.BundleContext
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.IWorkspace;
 
 object ScalastylePlugin {
   val PLUGIN_ID = "scalastyle-plugin" //$NON-NLS-1$
@@ -13,6 +15,8 @@ object ScalastylePlugin {
   def getDefault(): ScalastylePlugin = plugin
 
   def getImageDescriptor(path: String): ImageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path)
+  
+  def getWorkspace(): IWorkspace = ResourcesPlugin.getWorkspace();
 }
 
 /**

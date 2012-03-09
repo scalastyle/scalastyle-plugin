@@ -5,8 +5,9 @@ import org.segl.scalastyle._
 import java.io._
 
 object ConfigurationFile {
+  // TODO change filename to an IFile?
   def write(filename: String, scalastyleConfiguration: ScalastyleConfiguration) = {
-    val s = new scala.xml.PrettyPrinter(1000, 1).format(ScalastyleConfiguration.toXml(scalastyleConfiguration))
+    val s = ScalastyleConfiguration.toXmlString(scalastyleConfiguration, 1000, 1)
 
     var out: Writer = null;
 

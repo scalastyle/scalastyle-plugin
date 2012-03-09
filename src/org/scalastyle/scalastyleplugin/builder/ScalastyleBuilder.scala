@@ -90,9 +90,9 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
     }
 
     try {
-      val projectConfiguration = ProjectConfigurations.get(project)
-      if (projectConfiguration.files.size > 0) {
-        val configuration = ScalastyleConfiguration.readFromXml(projectConfiguration.files(0))
+      val projectConfiguration = ProjectConfigurations.get()
+      if (projectConfiguration.file.isDefined) {
+        val configuration = ScalastyleConfiguration.readFromXml(projectConfiguration.file.get)
 
         val messages = new ScalastyleChecker[EclipseFileSpec]().checkFiles(configuration, resources.map(r => {
           new EclipseFileSpec(r.getLocation().toFile().getAbsolutePath(), r)
@@ -173,9 +173,6 @@ class EclipseOutput extends Output[EclipseFileSpec] {
 
       MarkerUtilities.setLineNumber(markerAttributes, error.lineNumber.getOrElse(1));
       MarkerUtilities.setMessage(markerAttributes, messageHelper.message(error.clazz, error.key, error.args));
-
-      //                        // TODO calculate offset for editor annotations
-      //                        calculateMarkerOffset(error, mMarkerAttributes);
 
       // create a marker for the file
       MarkerUtilities.createMarker(error.fileSpec.resource, markerAttributes, ScalastyleMarker.MARKER_ID)

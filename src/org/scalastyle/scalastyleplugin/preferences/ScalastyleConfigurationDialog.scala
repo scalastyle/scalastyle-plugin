@@ -14,6 +14,7 @@ import org.segl.scalastyle._;
 import org.eclipse.jface.viewers._
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.window.Window;
+import org.scalastyle.scalastyleplugin.ScalastylePlugin;
 
 case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChecker: Option[ConfigurationChecker]) {
   def enabled = _configurationChecker.isDefined
@@ -63,12 +64,13 @@ case class Model(definition: ScalastyleDefinition, configuration: ScalastyleConf
 
 case class DialogColumn(name: String, alignment: Int, sorter: TableSorter[ModelChecker, String], weight: Int, getText: (ModelChecker) => String)
 
-class ScalastyleConfigurationDialog(parent: Shell, config: String, file: String) extends TitleAreaDialog(parent) {
+class ScalastyleConfigurationDialog(parent: Shell, file: String) extends TitleAreaDialog(parent) {
   import ScalastyleUI._;
   setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX)
   val classLoader = this.getClass().getClassLoader()
   val definition = ScalastyleDefinition.readFromXml(classLoader.getResourceAsStream("/scalastyle_definition.xml"))
-  val configuration = ScalastyleConfiguration.readFromXml(file)
+  val rootFilename = ScalastylePlugin.getWorkspace().getRoot().getLocation().toFile().getAbsolutePath()
+  val configuration = ScalastyleConfiguration.readFromXml(rootFilename + file)
   val model = new Model(definition, configuration)
   val messageHelper = new MessageHelper(classLoader)
   var editButton: Button = _
@@ -134,7 +136,7 @@ class ScalastyleConfigurationDialog(parent: Shell, config: String, file: String)
     
     if (model.dirty) {
       println("writing")
-      ConfigurationFile.write(file, model.toConfiguration)
+      ConfigurationFile.write(rootFilename + file, model.toConfiguration)
     }
     super.okPressed();
   }
