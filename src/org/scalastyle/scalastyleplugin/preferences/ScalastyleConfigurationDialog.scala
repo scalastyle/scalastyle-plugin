@@ -56,8 +56,7 @@ case class Model(definition: ScalastyleDefinition, configuration: ScalastyleConf
   
   def dirty = list.find(_.dirty).isDefined
   
-  def toConfiguration: ScalastyleConfiguration = {
-    val name = configuration.name
+  def toConfiguration(name: String): ScalastyleConfiguration = {
     val checkers = list.map(mc => ConfigurationChecker(mc.configurationChecker.className, mc.configurationChecker.level, mc.configurationChecker.enabled, mc.configurationChecker.parameters))
     ScalastyleConfiguration(name, checkers)
   }
@@ -67,6 +66,7 @@ case class DialogColumn(name: String, alignment: Int, sorter: TableSorter[ModelC
 
 class ScalastyleConfigurationDialog(parent: Shell, file: String) extends TitleAreaDialog(parent) {
   import ScalastyleUI._;
+
   setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX)
   val classLoader = this.getClass().getClassLoader()
   val definition = ScalastyleDefinition.readFromXml(classLoader.getResourceAsStream("/scalastyle_definition.xml"))
@@ -74,12 +74,14 @@ class ScalastyleConfigurationDialog(parent: Shell, file: String) extends TitleAr
   val configuration = ScalastyleConfiguration.readFromXml(rootFilename + file)
   val model = new Model(definition, configuration)
   val messageHelper = new MessageHelper(classLoader)
+  var nameText: Text = _
   var editButton: Button = _
   var newButton: Button = _
   var currentSelection: Option[ModelChecker] = None;
   var tableViewer: TableViewer = _
 
-  private[this] val columns = Array(DialogColumn("Enabled", SWT.LEFT, null, 15, { mc => if (mc.configurationChecker.enabled) "true" else "false" }),
+  private[this] val columns = Array(
+    DialogColumn("Enabled", SWT.LEFT, null, 15, { mc => if (mc.configurationChecker.enabled) "true" else "false" }),
     DialogColumn("Name", SWT.LEFT, TableSorter.NameSorter, 15, { mc => messageHelper.name(mc.definitionChecker.id) }),
     DialogColumn("Severity", SWT.LEFT, TableSorter.SeveritySorter, 15, { mc => messageHelper.text(mc.configurationChecker.level.name) }),
     DialogColumn("Params", SWT.LEFT, TableSorter.ParamsSorter, 15, { mc => string(mc.configurationChecker.parameters) }),
@@ -95,6 +97,9 @@ class ScalastyleConfigurationDialog(parent: Shell, file: String) extends TitleAr
     contents.setLayoutData(new GridData(GridData.FILL_BOTH));
     contents.setLayout(new GridLayout());
 
+    label(contents, "Name")
+    nameText = text(contents, model.configuration.name, true, false)
+    
     val tableControl = configTable(contents, model.configuration);
     tableControl.setLayoutData(new GridData(GridData.FILL_BOTH));
 
@@ -105,7 +110,6 @@ class ScalastyleConfigurationDialog(parent: Shell, file: String) extends TitleAr
 
   private[this] def refresh() = {
     println("refresh")
-    println("eep " + currentSelection.get.configurationChecker.enabled)
     // TODO check that true, true is ok
     tableViewer.refresh(true, true)
   }
@@ -120,10 +124,7 @@ class ScalastyleConfigurationDialog(parent: Shell, file: String) extends TitleAr
     }
   }
 
-  private[this] def setSelection(modelChecker: ModelChecker) = {
-    println("modelChecker=" + modelChecker)
-    currentSelection = Some(modelChecker)
-  }
+  private[this] def setSelection(modelChecker: ModelChecker) = currentSelection = Some(modelChecker)
 
   private[this] def textEditor(table: Table) = {
     val te = new TextCellEditor(table)
@@ -134,10 +135,15 @@ class ScalastyleConfigurationDialog(parent: Shell, file: String) extends TitleAr
   override def okPressed(): Unit = {
     // TODO validation please
     println("ok pressed")
+
+    if (nameText.getText() == "") {
+      println("message please")
+    }
     
-    if (model.dirty) {
+    if (nameText.getText() != model.configuration.name || model.dirty) {
+      
       println("writing")
-      ConfigurationFile.write(rootFilename + file, model.toConfiguration)
+      ConfigurationFile.write(rootFilename + file, model.toConfiguration(nameText.getText()))
     }
     super.okPressed();
   }
@@ -229,12 +235,14 @@ object TableSorter {
 }
 
 class TableSorter[T, B <: java.lang.Comparable[B]](fn: (T) => B, var asc: Boolean) extends ViewerSorter {
+  var mult = if (asc) 1 else -1
   def flip(): this.type = {
     asc = !asc
+    mult = mult * -1
     this
   }
 
   override def compare(viewer: Viewer, o1: java.lang.Object, o2: java.lang.Object): Int = {
-    fn(o1.asInstanceOf[T]).compareTo(fn(o2.asInstanceOf[T])) * (if (asc) 1 else -1)
+    fn(o1.asInstanceOf[T]).compareTo(fn(o2.asInstanceOf[T])) * mult
   }
 }

@@ -2,6 +2,7 @@ package org.scalastyle.scalastyleplugin.builder
 
 import org.scalastyle.scalastyleplugin.ScalastylePlugin
 
+// TODO is this class necessary?
 class ScalastyleMarker
 
 object ScalastyleMarker {

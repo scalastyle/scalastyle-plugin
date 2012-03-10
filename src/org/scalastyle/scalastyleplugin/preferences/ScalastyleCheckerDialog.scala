@@ -64,20 +64,12 @@ class ScalastyleCheckerDialog(parent: Shell, modelChecker: ModelChecker) extends
   
   override def okPressed(): Unit = {
     // TODO validation please
-    
-    // TODO update model here
-    println("enabled=" + enabledCheckbox.getSelection())
     val enabled = enabledCheckbox.getSelection()
     val level = Level(severityCombo.getItem(severityCombo.getSelectionIndex()))
     
     val parameters = parameterControls.map({case (name, text) => (name, text.getText())}).toMap
     
-    // TODO add enabled
-//    val f = ConfigurationChecker(modelChecker.configurationChecker.className, level, enabled, parameters)
     modelChecker.set(level, enabled, parameters)
-    
-    println("parameters=" + parameters)
-    println("parameters=" + modelChecker.configurationChecker.parameters)
     
     super.okPressed()
   }
@@ -109,7 +101,6 @@ object ScalastyleUI {
   }
 
   def text(parent: Composite, defaultText: String, editable: Boolean, multiLine: Boolean): Text = {
-    println("text multiLine=" + multiLine)
     val text = new Text(parent, SWT.LEFT | (if (multiLine) SWT.MULTI else SWT.SINGLE) | SWT.BORDER)
 
     text.setEditable(editable)
@@ -118,14 +109,12 @@ object ScalastyleUI {
     val gridData =
       new GridData(
         GridData.FILL_BOTH | GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_FILL);
-//    gridData.horizontalSpan = 3;
     if (multiLine) {
     	gridData.heightHint = 200;
     }
     gridData.grabExcessVerticalSpace = true;
 
     text.setLayoutData(gridData);
-//    text.setLayoutData(new GridData(GridData.FILL_BOTH))
 
     text
   }

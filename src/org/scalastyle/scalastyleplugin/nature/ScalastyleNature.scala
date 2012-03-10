@@ -14,35 +14,24 @@ import org.scalastyle.scalastyleplugin.builder.ScalastyleBuilder
 import org.scalastyle.scalastyleplugin.builder.ScalastyleMarker
 
 object ScalastyleNature {
-  val NATURE_ID = ScalastylePlugin.PLUGIN_ID + ".ScalastyleNature"; //$NON-NLS-1$
+  val NATURE_ID = ScalastylePlugin.PLUGIN_ID + ".ScalastyleNature"
+  val ScalaBuilderId = "org.scala-ide.sdt.core.scalabuilder"
 
   /**
    * Checks if the ordering of the builders of the given project is correct,
    * more specifically if the ScalastyleBuilder is set to run after the
-   * JavaBuilder.
-   *
-   * @param project the project to check
-   * @return <code>true</code> if the builder order for this project is
-   *         correct, <code>false</code> otherwise
-   * @throws CoreException error getting project description
+   * ScalaBuilder.
    */
   def hasCorrectBuilderOrder(project: IProject): Boolean = {
-    val description = project.getDescription()
-    val commands = description.getBuildSpec()
+    val commands = project.getDescription().getBuildSpec()
 
-    var javaBuilderIndex: Int = -1;
-    var scalastyleBuilderIndex: Int = -1;
+    var scalaBuilderIndex = builderIndex(commands, ScalaBuilderId)
+    var scalastyleBuilderIndex = builderIndex(commands, ScalastyleBuilder.BUILDER_ID)
 
-    commands.zipWithIndex.foreach(x => {
-      if (x._1.getBuilderName().equals(ScalastyleBuilder.BUILDER_ID)) {
-        scalastyleBuilderIndex = x._2;
-      } else if (x._1.getBuilderName().equals(JavaCore.BUILDER_ID)) {
-        javaBuilderIndex = x._2;
-      }
-    })
-
-    javaBuilderIndex < scalastyleBuilderIndex
+    scalaBuilderIndex < scalastyleBuilderIndex
   }
+  
+  def builderIndex(commands: Array[ICommand], builderId: String): Int = commands.indexWhere(b => b.getBuilderName() == builderId)
 }
 
 class ScalastyleNature extends IProjectNature {
@@ -51,16 +40,14 @@ class ScalastyleNature extends IProjectNature {
   def configure(): Unit = {
     val description = project.getDescription();
     val commands = description.getBuildSpec();
-    var found = false;
 
     if (!commands.exists(c => c.getBuilderName().equals(ScalastyleBuilder.BUILDER_ID))) {
       // add builder to project
-      val command: ICommand = description.newCommand();
+      val command = description.newCommand();
       command.setBuilderName(ScalastyleBuilder.BUILDER_ID);
-      val newCommands = commands :+ command
 
-      description.setBuildSpec(newCommands);
-      project.setDescription(description, null)
+      description.setBuildSpec(commands :+ command);
+      project.setDescription(description, new NullProgressMonitor())
     }
   }
 
@@ -73,11 +60,10 @@ class ScalastyleNature extends IProjectNature {
     description.setBuildSpec(newCommands);
     project.setDescription(description, new NullProgressMonitor());
 
-    // remove checkstyle markers from the project
+    // remove markers from the project
     getProject().deleteMarkers(ScalastyleMarker.MARKER_ID, true, IResource.DEPTH_INFINITE);
   }
 
   def getProject: IProject = project
   def setProject(project: IProject) = this.project = project
-
 }
