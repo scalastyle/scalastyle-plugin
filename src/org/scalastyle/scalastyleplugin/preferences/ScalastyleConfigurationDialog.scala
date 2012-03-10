@@ -17,12 +17,12 @@ import org.eclipse.jface.window.Window;
 import org.scalastyle.scalastyleplugin.ScalastylePlugin;
 
 case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChecker: Option[ConfigurationChecker]) {
-  def enabled = _configurationChecker.isDefined
+  def enabled = _configurationChecker.isDefined && _configurationChecker.get.enabled
   private[this] var configurationChecker = copyConfigurationChecker()
   var dirty = false
   
-  def set(level: Level, parameters: Map[String, String]) = {
-    configurationChecker = configurationChecker.copy(level = level, parameters = parameters)
+  def set(level: Level, enabled: Boolean, parameters: Map[String, String]) = {
+    configurationChecker = configurationChecker.copy(level = level, enabled = enabled, parameters = parameters)
     dirty = true
   }
   
@@ -30,6 +30,7 @@ case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChec
     definitionChecker.parameters.get(name).get.typeName
   }
   
+  // TODO pur some tests in here to ensure values are copied correctly etc.
   def configurationChecker(): ConfigurationChecker = configurationChecker
 
   private[this] def copyConfigurationChecker() = {
@@ -44,7 +45,7 @@ case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChec
   }
 
   def definitionToConfiguration(checker: DefinitionChecker): ConfigurationChecker = {
-    ConfigurationChecker(checker.className, checker.level, checker.parameters.map(m => (m._1, m._2.defaultValue)).toMap)
+    ConfigurationChecker(checker.className, checker.level, false, checker.parameters.map(m => (m._1, m._2.defaultValue)).toMap)
   }
 }
 
@@ -57,7 +58,7 @@ case class Model(definition: ScalastyleDefinition, configuration: ScalastyleConf
   
   def toConfiguration: ScalastyleConfiguration = {
     val name = configuration.name
-    val checkers = list.filter(_.enabled).map(mc => ConfigurationChecker(mc.configurationChecker.className, mc.configurationChecker.level, mc.configurationChecker.parameters))
+    val checkers = list.map(mc => ConfigurationChecker(mc.configurationChecker.className, mc.configurationChecker.level, mc.configurationChecker.enabled, mc.configurationChecker.parameters))
     ScalastyleConfiguration(name, checkers)
   }
 }
@@ -78,7 +79,7 @@ class ScalastyleConfigurationDialog(parent: Shell, file: String) extends TitleAr
   var currentSelection: Option[ModelChecker] = None;
   var tableViewer: TableViewer = _
 
-  private[this] val columns = Array(DialogColumn("Enabled", SWT.LEFT, null, 15, { mc => if (mc.enabled) "true" else "false" }),
+  private[this] val columns = Array(DialogColumn("Enabled", SWT.LEFT, null, 15, { mc => if (mc.configurationChecker.enabled) "true" else "false" }),
     DialogColumn("Name", SWT.LEFT, TableSorter.NameSorter, 15, { mc => messageHelper.name(mc.definitionChecker.id) }),
     DialogColumn("Severity", SWT.LEFT, TableSorter.SeveritySorter, 15, { mc => messageHelper.text(mc.configurationChecker.level.name) }),
     DialogColumn("Params", SWT.LEFT, TableSorter.ParamsSorter, 15, { mc => string(mc.configurationChecker.parameters) }),
@@ -104,7 +105,7 @@ class ScalastyleConfigurationDialog(parent: Shell, file: String) extends TitleAr
 
   private[this] def refresh() = {
     println("refresh")
-    println("eep " + currentSelection.get.configurationChecker.parameters)
+    println("eep " + currentSelection.get.configurationChecker.enabled)
     // TODO check that true, true is ok
     tableViewer.refresh(true, true)
   }
