@@ -172,7 +172,7 @@ class EclipseOutput extends Output[EclipseFileSpec] {
         "categoryId" -> 998)
 
       MarkerUtilities.setLineNumber(markerAttributes, error.lineNumber.getOrElse(1));
-      MarkerUtilities.setMessage(markerAttributes, messageHelper.message(error.clazz, error.key, error.args));
+      MarkerUtilities.setMessage(markerAttributes, messageHelper.message(error.clazz.getClassLoader(), error.key, error.args));
 
       // create a marker for the file
       MarkerUtilities.createMarker(error.fileSpec.resource, markerAttributes, ScalastyleMarker.MARKER_ID)

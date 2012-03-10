@@ -82,11 +82,12 @@ class ScalastyleConfigurationDialog(parent: Shell, file: String) extends TitleAr
 
   private[this] val columns = Array(
     DialogColumn("Enabled", SWT.LEFT, null, 15, { mc => if (mc.configurationChecker.enabled) "true" else "false" }),
-    DialogColumn("Name", SWT.LEFT, TableSorter.NameSorter, 15, { mc => messageHelper.name(mc.definitionChecker.id) }),
+    DialogColumn("Name", SWT.LEFT, TableSorter.NameSorter, 15, { mc => messageHelper.label(mc.definitionChecker.id) }),
     DialogColumn("Severity", SWT.LEFT, TableSorter.SeveritySorter, 15, { mc => messageHelper.text(mc.configurationChecker.level.name) }),
     DialogColumn("Params", SWT.LEFT, TableSorter.ParamsSorter, 15, { mc => string(mc.configurationChecker.parameters) }),
     DialogColumn("Class", SWT.LEFT, TableSorter.ClassSorter, 15, { mc => mc.definitionChecker.className }),
-    DialogColumn("Comments", SWT.LEFT, TableSorter.CommentSorter, 15, { mc => "" }))
+    DialogColumn("Comments", SWT.LEFT, TableSorter.CommentSorter, 15, { mc => "" })
+  )
 
   private[this] def string(map: Map[String, String]): String = map.map(cp => cp._1 + "=" + cp._2).mkString(",")
 
@@ -117,7 +118,7 @@ class ScalastyleConfigurationDialog(parent: Shell, file: String) extends TitleAr
   private[this] def editChecker(modelChecker: Option[ModelChecker]): Unit = {
     println("editChecker")
     if (modelChecker.isDefined) {
-      val dialog = new ScalastyleCheckerDialog(getShell(), modelChecker.get)
+      val dialog = new ScalastyleCheckerDialog(getShell(), messageHelper, modelChecker.get)
       if (Window.OK == dialog.open()) {
         refresh()
       }

@@ -7,7 +7,7 @@ import org.eclipse.swt.layout._;
 import org.eclipse.swt.events._;
 import org.segl.scalastyle._;
 
-class ScalastyleCheckerDialog(parent: Shell, modelChecker: ModelChecker) extends TitleAreaDialog(parent) {
+class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, modelChecker: ModelChecker) extends TitleAreaDialog(parent) {
   import ScalastyleUI._;
   setShellStyle(getShellStyle() | SWT.RESIZE);
   var resetButton: Button = _
@@ -29,8 +29,12 @@ class ScalastyleCheckerDialog(parent: Shell, modelChecker: ModelChecker) extends
     // TODO make it look nice
     // TODO add description
 
+    val id = modelChecker.definitionChecker.id
     label(allContents, "Id")
-    text(allContents, modelChecker.definitionChecker.id, false, false)
+    text(allContents, id, false, false)
+
+    label(allContents, "Description")
+    text(allContents, messageHelper.description(id), false, false)
 
     label(allContents, "Class")
     text(allContents, modelChecker.configurationChecker.className, false, false)
@@ -46,9 +50,9 @@ class ScalastyleCheckerDialog(parent: Shell, modelChecker: ModelChecker) extends
 
       parameterControls = modelChecker.configurationChecker.parameters.map({
         case (name, value) => {
-          label(parameterGroup, name)
+          label(parameterGroup, messageHelper.label(id + "." + name))
           println("modelChecker.typeOf(name)=" + modelChecker.typeOf(name))
-          (name, text(parameterGroup, value, true, modelChecker.typeOf(name) == "multistring"))
+          (name, text(parameterGroup, value, true, modelChecker.typeOf(name) == "multistring", messageHelper.description(id + "." + name)))
         }
       })
     }
@@ -100,7 +104,7 @@ object ScalastyleUI {
     label
   }
 
-  def text(parent: Composite, defaultText: String, editable: Boolean, multiLine: Boolean): Text = {
+  def text(parent: Composite, defaultText: String, editable: Boolean, multiLine: Boolean, tooltip: String = null): Text = {
     val text = new Text(parent, SWT.LEFT | (if (multiLine) SWT.MULTI else SWT.SINGLE) | SWT.BORDER)
 
     text.setEditable(editable)
@@ -109,12 +113,15 @@ object ScalastyleUI {
     val gridData =
       new GridData(
         GridData.FILL_BOTH | GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_FILL);
+    
     if (multiLine) {
     	gridData.heightHint = 200;
     }
+    
     gridData.grabExcessVerticalSpace = true;
 
     text.setLayoutData(gridData);
+    text.setToolTipText(tooltip);
 
     text
   }
