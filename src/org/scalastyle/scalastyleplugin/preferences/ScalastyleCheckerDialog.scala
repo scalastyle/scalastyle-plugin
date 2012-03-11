@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets._;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout._;
 import org.eclipse.swt.events._;
-import org.segl.scalastyle._;
+import org.scalastyle._;
 import org.scalastyle.scalastyleplugin.SwtUtils._;
 
 class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, modelChecker: ModelChecker) extends TitleAreaDialog(parent) {

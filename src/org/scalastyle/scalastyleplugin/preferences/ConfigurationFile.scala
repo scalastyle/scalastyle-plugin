@@ -17,7 +17,7 @@
 package org.scalastyle.scalastyleplugin.preferences
 
 import scala.xml.Elem
-import org.segl.scalastyle._
+import org.scalastyle._
 import org.scalastyle.scalastyleplugin.config._
 import java.io._
 

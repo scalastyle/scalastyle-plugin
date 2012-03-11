@@ -36,11 +36,11 @@ import scala.collection.mutable.HashMap
 import org.scalastyle.scalastyleplugin.ScalastylePlugin
 import org.scalastyle.scalastyleplugin.ScalastylePluginException
 import org.scalastyle.scalastyleplugin.nature.ScalastyleNature
-import org.segl.scalastyle.ScalastyleConfiguration
-import org.segl.scalastyle.TextOutput
+import org.scalastyle.ScalastyleConfiguration
+import org.scalastyle.TextOutput
 import org.scalastyle.scalastyleplugin.config._
-import org.segl.scalastyle.ScalastyleChecker
-import org.segl.scalastyle._
+import org.scalastyle.ScalastyleChecker
+import org.scalastyle._
 import scala.collection.JavaConversions._
 
 class EclipseFileSpec(val name: String, val resource: IResource) extends FileSpec

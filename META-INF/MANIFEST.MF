@@ -30,6 +30,6 @@ Export-Package: org.scalastyle.scalastyleplugin,
  org.scalastyle.scalastyleplugin.config,
  org.scalastyle.scalastyleplugin.nature,
  org.scalastyle.scalastyleplugin.preferences,
- org.segl.scalastyle,
- org.segl.scalastyle.file,
- org.segl.scalastyle.scalariform
+ org.scalastyle,
+ org.scalastyle.file,
+ org.scalastyle.scalariform

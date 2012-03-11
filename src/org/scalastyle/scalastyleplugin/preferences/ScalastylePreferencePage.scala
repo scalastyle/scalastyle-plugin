@@ -61,7 +61,7 @@ import org.eclipse.ui.dialogs.ElementTreeSelectionDialog
 import org.eclipse.jface.window.Window
 import org.scalastyle.scalastyleplugin.StringUtils._
 import org.scalastyle.scalastyleplugin.SwtUtils._
-import org.segl.scalastyle._
+import org.scalastyle._
 import org.eclipse.jface.viewers.TableViewer
 
 case class Configuration(name: String, location: String) extends TableLine

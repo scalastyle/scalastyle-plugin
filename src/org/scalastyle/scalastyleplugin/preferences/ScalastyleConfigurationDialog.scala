@@ -26,7 +26,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout._;
 import org.eclipse.swt.widgets.{List => _, _}
 import org.eclipse.jface.dialogs.Dialog;
-import org.segl.scalastyle._;
+import org.scalastyle._;
 import org.eclipse.jface.viewers._
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.window.Window;

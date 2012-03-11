@@ -23,8 +23,8 @@ import scala.xml._
 
 import org.eclipse.core.resources.IProject
 import org.scalastyle.scalastyleplugin.ScalastylePlugin
-import org.segl.scalastyle.ScalastyleConfiguration
-import org.segl.scalastyle.XmlPrettyPrinter
+import org.scalastyle.ScalastyleConfiguration
+import org.scalastyle.XmlPrettyPrinter
 import org.eclipse.core.resources.ResourcesPlugin
 
 case class WorkspaceConfiguration(file: String)
