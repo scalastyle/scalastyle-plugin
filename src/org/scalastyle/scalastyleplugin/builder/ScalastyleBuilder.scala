@@ -1,3 +1,19 @@
+// Copyright (C) 2011-2012 the original author or authors.
+// See the LICENCE.txt file distributed with this work for additional
+// information regarding copyright ownership.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package org.scalastyle.scalastyleplugin.builder
 
 import org.eclipse.core.resources.IContainer
@@ -22,7 +38,7 @@ import org.scalastyle.scalastyleplugin.ScalastylePluginException
 import org.scalastyle.scalastyleplugin.nature.ScalastyleNature
 import org.segl.scalastyle.ScalastyleConfiguration
 import org.segl.scalastyle.TextOutput
-import org.scalastyle.scalastyleplugin.config.ProjectConfigurations
+import org.scalastyle.scalastyleplugin.config._
 import org.segl.scalastyle.ScalastyleChecker
 import org.segl.scalastyle._
 import scala.collection.JavaConversions._
@@ -48,7 +64,7 @@ object ScalastyleBuilder {
 
   def buildProjects(projects: Array[IProject]) = {
     val scalastyleProjects = projects.filter(project => {
-      project.exists() && project.isOpen() && project.hasNature(ScalastyleNature.NATURE_ID) && ProjectConfigurations.get.file.isDefined
+      project.exists() && project.isOpen() && project.hasNature(ScalastyleNature.NATURE_ID) && Persistence.loadWorkspace().configurations.size > 0
     })
 
     val buildJob = BuildProjectJob(scalastyleProjects, IncrementalProjectBuilder.FULL_BUILD)
@@ -99,15 +115,21 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
     }
 
     try {
-      val projectConfiguration = ProjectConfigurations.get()
-      if (projectConfiguration.file.isDefined) {
-        val configuration = ScalastyleConfiguration.readFromXml(projectConfiguration.file.get)
+      val projectConfiguration = Persistence.loadProject(project)
+      if (projectConfiguration.enabled && projectConfiguration.file.isDefined) {
+//        val file = project.getFile(projectConfiguration.file.get).getLocation().toFile().getAbsolutePath()
+        val file = Persistence.findConfiguration(projectConfiguration.file.get)
+        if (file.isDefined && !file.get.exists) {
+          println("can't find " + file.get.getAbsolutePath())
+        } else {
+            val configuration = ScalastyleConfiguration.readFromXml(file.get.getAbsolutePath())
 
-        val messages = new ScalastyleChecker[EclipseFileSpec]().checkFiles(configuration, resources.map(r => {
-          new EclipseFileSpec(r.getLocation().toFile().getAbsolutePath(), r)
-        }).toList)
+            val messages = new ScalastyleChecker[EclipseFileSpec]().checkFiles(configuration, resources.map(r => {
+              new EclipseFileSpec(r.getLocation().toFile().getAbsolutePath(), r)
+            }).toList)
 
-        new EclipseOutput().output(messages);
+            new EclipseOutput().output(messages);
+        }
       }
     } catch {
       // TODO probably add something to the error log and marker?

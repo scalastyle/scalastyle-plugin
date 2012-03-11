@@ -1,30 +1,23 @@
+// Copyright (C) 2011-2012 the original author or authors.
+// See the LICENCE.txt file distributed with this work for additional
+// information regarding copyright ownership.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package org.scalastyle.scalastyleplugin.preferences
 
 import scala.xml.Elem
 import org.segl.scalastyle._
+import org.scalastyle.scalastyleplugin.config._
 import java.io._
 
-object ConfigurationFile {
-  // TODO change filename to an IFile?
-  def write(filename: String, scalastyleConfiguration: ScalastyleConfiguration) = {
-    val s = ScalastyleConfiguration.toXmlString(scalastyleConfiguration, 1000, 1)
-
-    var out: Writer = null;
-
-    try {
-      out = new BufferedWriter(new FileWriter(filename))
-      out.write(s)
-    } catch {
-      case e => throw e // TODO do something here
-    } finally {
-      try {
-        if (out != null) {
-          out.close();
-        }
-      } catch {
-        case _ => // do nothing
-      }
-    }
-  }
-
-}

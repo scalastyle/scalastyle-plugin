@@ -118,5 +118,16 @@
             id="org.scalastyle.scalastyleplugin.preferences.ScalastylePreferencePage">
       </page>
    </extension>
-
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            objectClass="org.eclipse.core.resources.IProject"
+            adaptable="true"
+            name="Scalastyle"
+            nameFilter="*"
+            class="org.scalastyle.scalastyleplugin.preferences.ScalastylePropertyPage"
+            id="org.scalastyle.scalastyleplugin.preferences.ScalastylePropertyPage">
+            <filter name="open" value="true"/>
+      </page>
+   </extension>
 </plugin>

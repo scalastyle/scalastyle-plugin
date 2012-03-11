@@ -1,3 +1,19 @@
+// Copyright (C) 2011-2012 the original author or authors.
+// See the LICENCE.txt file distributed with this work for additional
+// information regarding copyright ownership.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package org.scalastyle.scalastyleplugin.preferences
 
 import org.eclipse.core.runtime.Platform
@@ -30,43 +46,42 @@ import org.eclipse.ui.IWorkbench
 import org.eclipse.ui.IWorkbenchPreferencePage
 import org.osgi.service.prefs.BackingStoreException
 import org.scalastyle.scalastyleplugin.ScalastylePlugin
-import org.scalastyle.scalastyleplugin.config.ProjectConfiguration
-import org.scalastyle.scalastyleplugin.config.ProjectConfigurations
+import org.scalastyle.scalastyleplugin.config._
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog
-import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
-import org.eclipse.ui.dialogs.ISelectionStatusValidator;
-import org.eclipse.ui.model.WorkbenchContentProvider;
-import org.eclipse.ui.model.WorkbenchLabelProvider;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.ElementTreeSelectionDialog
+import org.eclipse.ui.dialogs.ISelectionStatusValidator
+import org.eclipse.ui.model.WorkbenchContentProvider
+import org.eclipse.ui.model.WorkbenchLabelProvider
+import org.eclipse.core.runtime.IStatus
+import org.eclipse.core.resources.IFile
+import org.eclipse.core.runtime.Status
+import org.eclipse.ui.PlatformUI
 import org.eclipse.swt.widgets.Shell
-import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
-import org.eclipse.jface.window.Window;
+import org.eclipse.ui.dialogs.ElementTreeSelectionDialog
+import org.eclipse.jface.window.Window
 import org.scalastyle.scalastyleplugin.StringUtils._
 import org.scalastyle.scalastyleplugin.SwtUtils._
 import org.segl.scalastyle._
+import org.eclipse.jface.viewers.TableViewer
 
 case class Configuration(name: String, location: String) extends TableLine
 
-case class Configurations(elements: List[Configuration]) extends Container[Configuration]
+case class Configurations(var elements: List[Configuration]) extends Container[Configuration]
 
 class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferencePage {
-  /** text field containing the location. */
-  var filenameText: Text = _
-
-  /** browse button. */
-  var browseButton: Button = _
-
   setPreferenceStore(ScalastylePlugin.getDefault().getPreferenceStore())
 
   val NameSorter = new TableSorter[Configuration, String](_.name, true)
   val LocationSorter = new TableSorter[Configuration, String](_.location, true)
   val classLoader = this.getClass().getClassLoader()
   val messageHelper = new MessageHelper(classLoader)
-  val model = new Configurations(List[Configuration](Configuration("name", "foobar")))
-  
+  val model = toConfigurations(Persistence.loadWorkspace())
+
+  var editButton: Button = _
+  var currentSelection: Configuration = _
+  var browseButton: Button = _
+  var tableViewer: TableViewer = _
+
   private[this] val columns = List(
     DialogColumn[Configuration]("Name", SWT.LEFT, NameSorter, 30, { _.name }),
     DialogColumn[Configuration]("Location", SWT.LEFT, LocationSorter, 70, { _.location })
@@ -74,59 +89,51 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
 
   def createContents(parent: Composite): Control = {
     noDefaultAndApplyButton()
-    
+
     // there is a bug in SWT which means you can't mix & match FormLayout
     // and GridLayout, you get java.lang.ClassCastException: org.eclipse.swt.layout.GridData cannot be cast to org.eclipse.swt.layout.FormData
     // so we set the parent layout here
-    
+
     parent.setLayout(gridLayout())
     parent.setLayoutData(gridData())
     val parentComposite = composite(parent)
 
-//    val configurationsGroup = group(parentComposite, "Configurations");
+    val configurationsGroup = group(parentComposite, "Configurations");
 
-//    table(configurationsGroup, model, columns, new ModelContentProvider(model), new PropertiesLabelProvider(columns), setSelection, refresh)
+    tableViewer = table(configurationsGroup, model, columns, new ModelContentProvider(model), new PropertiesLabelProvider(columns), setSelection, refresh)
 
-    val generalComposite = createGeneralContents(parentComposite)
+//    val generalComposite = createGeneralContents(parentComposite)
+
+    val browseButton = button(configurationsGroup, "Browse", true, {
+      browseForFile(this.getShell(), "Select a scalastyle configuration file") match {
+        case Some(file) => addConfiguration(file)
+        case None =>
+      }
+    })
+
+    editButton = button(configurationsGroup, "Edit", false, {
+      editConfiguration(currentSelection);
+    })
+
 
     parentComposite
   }
-  
+
+  def addConfiguration(file: IFile) = {
+    println("add configuration" + file.getFullPath().toString())
+    model.elements = model.elements ::: List(Configuration("name", file.getFullPath().toString()))
+    refresh()
+  }
+
   def setSelection(selection: Configuration): Unit = {
     println("setSelection")
+    currentSelection = selection
+    editButton.setEnabled(true);
   }
-  
+
   def refresh(): Unit = {
     println("refresh")
-  }
-  
-  def createGeneralContents(parent: Composite): Control = {
-    val generalComposite = group(parent, "General", layout = gridLayout(1, 10))
-
-    val configurationComposite = composite(generalComposite, layout = gridLayout(4, 10), layoutData=Some(gridData(GridData.FILL_HORIZONTAL)))
-
-    val configurationLabel = label(configurationComposite, "Configuration (relative to project)")
-
-    val configuration = ProjectConfigurations.get()
-
-    filenameText = text(configurationComposite, configuration.file.getOrElse(""), true, false)
-
-    val browseButton = button(configurationComposite, "Browse", true, {
-      browseForFile(this.getShell(), "Select a scalastyle configuration file") match {
-        case Some(file) => filenameText.setText(file.getFullPath().toString())
-        case None => 
-      }
-    })
-
-    val editButton = button(configurationComposite, "Edit", true, {
-      if (!isEmpty(filenameText.getText())) {
-        editConfiguration(filenameText.getText());
-      } else {
-        println("message saying must specify a file name")
-      }
-    })
-
-    generalComposite
+    tableViewer.refresh(true, true)
   }
 
   private[this] def browseForFile(shell: Shell, title: String): Option[IFile] = {
@@ -142,14 +149,14 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
 //    }
 //    dialog.setInitialSelection(initial)
     dialog.setInput(ScalastylePlugin.getWorkspace().getRoot())
-    
+
     dialog.setValidator(new ISelectionStatusValidator() {
       def validate(selection: Array[Object]): IStatus = {
         val valid = selection.length == 1 && selection(0).isInstanceOf[IFile]
         new Status(if (valid) IStatus.OK else IStatus.ERROR, PlatformUI.PLUGIN_ID, IStatus.ERROR, "", null)
       }
     });
-    
+
     if (Window.OK == dialog.open()) {
       val result = dialog.getResult();
       val checkFile = result(0).asInstanceOf[IFile];
@@ -159,8 +166,8 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
     }
   }
 
-  private[this] def editConfiguration(file: String) = {
-    val dialog = new ScalastyleConfigurationDialog(getShell(), file);
+  private[this] def editConfiguration(configuration: Configuration) = {
+    val dialog = new ScalastyleConfigurationDialog(getShell(), configuration.location);
     dialog.setBlockOnOpen(true);
     dialog.open();
   }
@@ -169,8 +176,8 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
 
   override def performOk(): Boolean = {
     try {
-      val configurationFile = filenameText.getText();
-      ProjectConfigurations.save(ProjectConfiguration(toOption(configurationFile)))
+//      val configurationFile = filenameText.getText();
+      Persistence.saveWorkspace(toWorkspaceConfigurations(model))
 
       true
     } catch {
@@ -182,5 +189,13 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
         }
         false
     }
+  }
+
+  def toConfigurations(workspaceConfigurations: WorkspaceConfigurations) = {
+    Configurations(workspaceConfigurations.configurations.map(c => Configuration("name", c.file)))
+  }
+
+  def toWorkspaceConfigurations(configurations: Configurations) = {
+    WorkspaceConfigurations(configurations.elements.map(c => WorkspaceConfiguration(c.location)))
   }
 }
