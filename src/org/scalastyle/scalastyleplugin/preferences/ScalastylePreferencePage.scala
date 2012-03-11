@@ -78,7 +78,7 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
     filenameText = text(configurationComposite, configuration.file.getOrElse(""), true, false)
 
     val browseButton = button(configurationComposite, "Browse", true, {
-      browseForFile(this.getShell(), "Select a scalastyle configuration file", configuration.file) match {
+      browseForFile(this.getShell(), "Select a scalastyle configuration file") match {
         case Some(file) => filenameText.setText(file.getFullPath().toString())
         case None => 
       }
