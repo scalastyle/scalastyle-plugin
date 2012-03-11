@@ -48,7 +48,7 @@ object ScalastyleBuilder {
 
   def buildProjects(projects: Array[IProject]) = {
     val scalastyleProjects = projects.filter(project => {
-      project.exists() && project.isOpen() && project.hasNature(ScalastyleNature.NATURE_ID)
+      project.exists() && project.isOpen() && project.hasNature(ScalastyleNature.NATURE_ID) && ProjectConfigurations.get.file.isDefined
     })
 
     val buildJob = BuildProjectJob(scalastyleProjects, IncrementalProjectBuilder.FULL_BUILD)
@@ -58,10 +58,6 @@ object ScalastyleBuilder {
 }
 
 class ScalastyleBuilder extends IncrementalProjectBuilder {
-  /**
-   * @see org.eclipse.core.internal.events.InternalBuilder #build(int,
-   *      java.util.Map, org.eclipse.core.runtime.IProgressMonitor)
-   */
   def build(kind: Int, args: java.util.Map[_, _], monitor: IProgressMonitor): Array[IProject] = {
     // get the associated project for this builder
     val project = getProject();
@@ -75,7 +71,20 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
       val files = if (resourceDelta != null) getDeltaFiles(resourceDelta, filters) else getProjectFiles(project, filters)
       handleBuildSelection(files, monitor, project, kind);
     } else {
-      // TODO not sure what to do here?
+      // the builder order is wrong. Refuse to check and create a error.
+
+      // remove all existing markers
+      project.deleteMarkers(ScalastyleMarker.MARKER_ID, false, IResource.DEPTH_INFINITE);
+
+      // categoryId enables own category under Java Problem Type
+      // setting for Problems view (RFE 1530366)
+      val markerAttributes = Map[Object, Object](IMarker.PRIORITY -> Integer.valueOf(IMarker.PRIORITY_HIGH),
+        IMarker.SEVERITY -> Integer.valueOf(IMarker.SEVERITY_ERROR),
+        IMarker.MESSAGE -> ("Project builder is not in correct order (should be after scala builder) for project " + project.getName()),
+        "categoryId" -> Integer.valueOf(999));
+
+      // create a marker for the project
+      MarkerUtilities.createMarker(project, markerAttributes, ScalastyleMarker.MARKER_ID);
     }
 
     Array(project)
@@ -164,7 +173,7 @@ class EclipseOutput extends Output[EclipseFileSpec] {
         case ErrorLevel => IMarker.SEVERITY_ERROR
         case _ => IMarker.SEVERITY_WARNING
       }
-      
+
       val markerAttributes: java.util.Map[String, Any] = HashMap(ScalastyleMarker.MODULE_NAME -> "module",
         ScalastyleMarker.MESSAGE_KEY -> error.key,
         IMarker.PRIORITY -> IMarker.PRIORITY_NORMAL,
