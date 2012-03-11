@@ -46,6 +46,11 @@ import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.jface.window.Window;
 import org.scalastyle.scalastyleplugin.StringUtils._
 import org.scalastyle.scalastyleplugin.SwtUtils._
+import org.segl.scalastyle._
+
+case class Configuration(name: String, location: String) extends TableLine
+
+case class Configurations(elements: List[Configuration]) extends Container[Configuration]
 
 class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferencePage {
   /** text field containing the location. */
@@ -56,20 +61,49 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
 
   setPreferenceStore(ScalastylePlugin.getDefault().getPreferenceStore())
 
+  val NameSorter = new TableSorter[Configuration, String](_.name, true)
+  val LocationSorter = new TableSorter[Configuration, String](_.location, true)
+  val classLoader = this.getClass().getClassLoader()
+  val messageHelper = new MessageHelper(classLoader)
+  val model = new Configurations(List[Configuration](Configuration("name", "foobar")))
+  
+  private[this] val columns = List(
+    DialogColumn[Configuration]("Name", SWT.LEFT, NameSorter, 30, { _.name }),
+    DialogColumn[Configuration]("Location", SWT.LEFT, LocationSorter, 70, { _.location })
+  )
+
   def createContents(parent: Composite): Control = {
     noDefaultAndApplyButton()
+    
+    // there is a bug in SWT which means you can't mix & match FormLayout
+    // and GridLayout, you get java.lang.ClassCastException: org.eclipse.swt.layout.GridData cannot be cast to org.eclipse.swt.layout.FormData
+    // so we set the parent layout here
+    
+    parent.setLayout(gridLayout())
+    parent.setLayoutData(gridData())
+    val parentComposite = composite(parent)
 
-    val parentComposite = composite(parent, layout = new FormLayout())
+//    val configurationsGroup = group(parentComposite, "Configurations");
+
+//    table(configurationsGroup, model, columns, new ModelContentProvider(model), new PropertiesLabelProvider(columns), setSelection, refresh)
 
     val generalComposite = createGeneralContents(parentComposite)
 
     parentComposite
   }
   
+  def setSelection(selection: Configuration): Unit = {
+    println("setSelection")
+  }
+  
+  def refresh(): Unit = {
+    println("refresh")
+  }
+  
   def createGeneralContents(parent: Composite): Control = {
-    val generalComposite = group(parent, "General", gridData(GridData.FILL_HORIZONTAL), gridLayout(1, 10), layoutData = Some(formData()))
+    val generalComposite = group(parent, "General", layout = gridLayout(1, 10))
 
-    val configurationComposite = composite(generalComposite, layout = gridLayout(4, 10))
+    val configurationComposite = composite(generalComposite, layout = gridLayout(4, 10), layoutData=Some(gridData(GridData.FILL_HORIZONTAL)))
 
     val configurationLabel = label(configurationComposite, "Configuration (relative to project)")
 

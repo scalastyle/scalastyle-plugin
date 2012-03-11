@@ -15,9 +15,12 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.window.Window;
 
 object SwtUtils {
-  def composite(parent: Composite, gridData: GridData = defaultGridData, layout: Layout = defaultGridLayout) = {
+  def composite(parent: Composite, layoutData: Option[Any] = Some(defaultGridData), layout: Layout = defaultGridLayout) = {
     val composite = new Composite(parent, SWT.NULL);
-    composite.setLayoutData(gridData);
+    if (layoutData.isDefined) {
+      composite.setLayoutData(layoutData.get)
+    }
+
     composite.setLayout(layout);
 
     composite
@@ -25,25 +28,24 @@ object SwtUtils {
 
   private[this] val defaultGridData = gridData()
   private[this] val defaultGridLayout = gridLayout(1)
-  
+
   def gridData(style: Int = GridData.FILL_BOTH) = new GridData(style)
 
-  def gridLayout(columns: Int, margin: Int = 5): GridLayout = {
+  def gridLayout(columns: Int = 1, margin: Int = 5): GridLayout = {
     val gridLayout = new GridLayout()
     gridLayout.numColumns = columns
     gridLayout.marginHeight = margin;
     gridLayout.marginWidth = margin;
     gridLayout
   }
-  
-  def group(parent: Composite, label: String, gridData: GridData = defaultGridData, layout: Layout = defaultGridLayout, layoutData: Option[FormData] = None) = {
+
+  def group(parent: Composite, label: String, layoutData: Option[Any] = Some(defaultGridData), layout: Layout = defaultGridLayout) = {
     val group = new Group(parent, SWT.NULL)
-    group.setLayoutData(gridData);
 
     if (layoutData.isDefined) {
-        group.setLayoutData(layoutData.get)
+      group.setLayoutData(layoutData.get)
     }
-    
+
     group.setLayout(layout)
     group.setText(label)
 
@@ -84,8 +86,7 @@ object SwtUtils {
     val button = new Button(parent, SWT.PUSH);
     button.setText(text);
     button.setEnabled(enabled);
-    val gd = new GridData();
-    button.setLayoutData(gd);
+    button.setLayoutData(new GridData())
 
     button.addSelectionListener(new SelectionListener() {
       def widgetSelected(e: SelectionEvent): Unit = fn
@@ -113,11 +114,11 @@ object SwtUtils {
     val gridData =
       new GridData(
         GridData.FILL_BOTH | GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_FILL);
-    
+
     if (multiLine) {
-        gridData.heightHint = 200;
+      gridData.heightHint = 200;
     }
-    
+
     gridData.grabExcessVerticalSpace = true;
 
     text.setLayoutData(gridData);
@@ -143,7 +144,7 @@ object SwtUtils {
 
     combo
   }
-  
+
   def formData() = {
     val fd = new FormData()
     fd.left = new FormAttachment(0)
@@ -151,6 +152,73 @@ object SwtUtils {
     fd.right = new FormAttachment(100)
 
     fd
+  }
+
+  case class DialogColumn[T](name: String, alignment: Int, sorter: TableSorter[T, String], weight: Int, getText: (T) => String)
+
+  def table[T](parent: Composite, model: Any, columns: List[DialogColumn[T]], contentProvider: IStructuredContentProvider, labelProvider: ITableLabelProvider, setSelection: (T) => Unit, refresh: => Unit): Table = {
+    val table = new Table(parent, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION)
+    table.setLayoutData(new GridData(GridData.FILL_BOTH))
+    table.setHeaderVisible(true)
+    table.setLinesVisible(true)
+
+    val tableLayout = new TableLayout()
+    table.setLayout(tableLayout)
+    // TODO don't assign this here
+    val tableViewer = new TableViewer(table);
+
+    val editors: Array[CellEditor] = columns.map(c => {
+      column(table, tableViewer, c.name, c.alignment, c.sorter, refresh)
+      tableLayout.addColumnData(new ColumnWeightData(c.weight))
+      textEditor(table)
+    }).toArray;
+
+    //    val f = new PropertiesLabelProvider(messageHelper, columns)
+    tableViewer.setLabelProvider(labelProvider)
+    tableViewer.setContentProvider(new ArrayContentProvider())
+    tableViewer.setInput(model)
+    tableViewer.setContentProvider(contentProvider)
+
+    table.addListener(SWT.Selection, new Listener() {
+      def handleEvent(event: Event) = {
+        val ss: StructuredSelection = tableViewer.getSelection().asInstanceOf[StructuredSelection];
+        setSelection(ss.getFirstElement().asInstanceOf[T])
+      }
+    });
+
+    table
+  }
+
+  private[this] def textEditor(table: Table) = {
+    val te = new TextCellEditor(table)
+    te.getControl().asInstanceOf[Text].setTextLimit(60);
+    te
+  }
+
+  trait TableLine
+
+  trait Container[+T <: TableLine] {
+    def elements(): List[T]
+  }
+
+  class ModelContentProvider[T <: TableLine](model: Container[T]) extends IStructuredContentProvider {
+    def inputChanged(v: Viewer, oldInput: java.lang.Object, newInput: java.lang.Object): Unit = {}
+    def dispose(): Unit = {}
+    def getElements(parent: Object): Array[java.lang.Object] = Array[java.lang.Object](model.elements: _*)
+  }
+
+  class PropertiesLabelProvider[T <: TableLine](columns: List[DialogColumn[T]]) extends LabelProvider with ITableLabelProvider {
+    def getColumnImage(element: Any, columnIndex: Int): Image = null
+
+    def getColumnText(element: java.lang.Object, columnIndex: Int): String = {
+      var line = element.asInstanceOf[T]
+
+      if (columnIndex >= 0 && columnIndex < columns.length) {
+        columns(columnIndex).getText(line)
+      } else {
+        ""
+      }
+    }
   }
 
 }

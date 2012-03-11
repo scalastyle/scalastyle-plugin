@@ -18,7 +18,7 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
   override def createDialogArea(parent: Composite): Control = {
     val dialogArea = super.createDialogArea(parent).asInstanceOf[Composite];
 
-    val contents = composite(dialogArea, gridData(GridData.FILL_BOTH), layout = gridLayout(1));
+    val contents = composite(dialogArea, Some(gridData(GridData.FILL_BOTH)), layout = gridLayout(1));
 
     val allContents = composite(contents, layout = gridLayout(2));
 
@@ -42,7 +42,7 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
     severityCombo = combo(allContents, Array("warning", "error"), modelChecker.configurationChecker.level.name)
 
     if (modelChecker.configurationChecker.parameters.size > 0) {
-      val parameterGroup = group(contents, "Parameters", layout = gridLayout(2), gridData = gridData(GridData.FILL_HORIZONTAL))
+      val parameterGroup = group(contents, "Parameters", layout = gridLayout(2), layoutData = Some(gridData(GridData.FILL_HORIZONTAL)))
 
       parameterControls = modelChecker.configurationChecker.parameters.map({
         case (name, value) => {
