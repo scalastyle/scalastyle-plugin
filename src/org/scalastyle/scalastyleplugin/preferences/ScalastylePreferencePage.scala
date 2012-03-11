@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.Shell
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.jface.window.Window;
 import org.scalastyle.scalastyleplugin.StringUtils._
+import org.scalastyle.scalastyleplugin.SwtUtils._
 
 class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferencePage {
   /** text field containing the location. */
@@ -55,95 +56,35 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
 
   setPreferenceStore(ScalastylePlugin.getDefault().getPreferenceStore())
 
-  def createContents(ancestor: Composite): Control = {
+  def createContents(parent: Composite): Control = {
     noDefaultAndApplyButton()
 
-    val parentComposite = new Composite(ancestor, SWT.NULL)
-    val layout = new FormLayout()
-    parentComposite.setLayout(layout)
+    val parentComposite = composite(parent, layout = new FormLayout())
 
     val generalComposite = createGeneralContents(parentComposite)
-    val fd1 = new FormData()
-    fd1.left = new FormAttachment(0)
-    fd1.top = new FormAttachment(0)
-    fd1.right = new FormAttachment(100)
-    generalComposite.setLayoutData(fd1)
 
     parentComposite
   }
-
-  private[this] def gridLayout(columns: Int, margin: Int = 0): GridLayout = {
-    val gridLayout = new GridLayout();
-    gridLayout.numColumns = columns;
-    gridLayout.marginHeight = margin;
-    gridLayout.marginWidth = margin;
-    gridLayout
-  }
-
-  def compositeGrid(parent: Composite, layout: GridLayout): Composite = {
-    val composite = new Composite(parent, SWT.NULL);
-    composite.setLayout(layout);
-    composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL))
-    composite
-  }
-
-  def group(parent: Composite, text: String, layout: GridLayout): Group = {
-    val group = new Group(parent, SWT.NULL)
-    group.setText(text);
-    group.setLayout(layout);
-    group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL))
-    group
-  }
-
-  def label(parent: Composite, text: String): Label = {
-    val label = new Label(parent, SWT.NULL)
-    label.setText(text)
-    label
-  }
-
-  def text(parent: Composite, textLimit: Int, widthHint: Int, contents: String): Text = {
-    val text = new Text(parent, SWT.SINGLE | SWT.BORDER);
-    text.setTextLimit(textLimit);
-
-    text.setText(contents);
-    val gd = new GridData()
-    gd.widthHint = widthHint;
-    text.setLayoutData(gd);
-
-    text
-  }
-
-  def button(parent: Composite, text: String, fn: => Unit): Button = {
-    val button = new Button(parent, SWT.PUSH);
-    button.setText(text);
-    button.addSelectionListener(new AllListeners(fn));
-    button
-  }
-
-  class AllListeners(fn: => Unit) extends SelectionListener {
-    def widgetSelected(e: SelectionEvent): Unit = fn
-    def widgetDefaultSelected(e: SelectionEvent): Unit = {}
-  }
-
+  
   def createGeneralContents(parent: Composite): Control = {
-    val generalComposite = group(parent, "General", gridLayout(1, 10))
+    val generalComposite = group(parent, "General", gridData(GridData.FILL_HORIZONTAL), gridLayout(1, 10), layoutData = Some(formData()))
 
-    val configurationComposite = compositeGrid(generalComposite, gridLayout(4, 10))
+    val configurationComposite = composite(generalComposite, layout = gridLayout(4, 10))
 
     val configurationLabel = label(configurationComposite, "Configuration (relative to project)")
 
     val configuration = ProjectConfigurations.get()
 
-    filenameText = text(configurationComposite, 500, 300, configuration.file.getOrElse(""))
+    filenameText = text(configurationComposite, configuration.file.getOrElse(""), true, false)
 
-    val browseButton = button(configurationComposite, "Browse", {
-      browseForFile(this.getShell(), "Select a scalastyle configuration file") match {
+    val browseButton = button(configurationComposite, "Browse", true, {
+      browseForFile(this.getShell(), "Select a scalastyle configuration file", configuration.file) match {
         case Some(file) => filenameText.setText(file.getFullPath().toString())
         case None => 
       }
     })
 
-    val editButton = button(configurationComposite, "Edit", {
+    val editButton = button(configurationComposite, "Edit", true, {
       if (!isEmpty(filenameText.getText())) {
         editConfiguration(filenameText.getText());
       } else {
@@ -156,11 +97,17 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
 
   private[this] def browseForFile(shell: Shell, title: String): Option[IFile] = {
     val dialog = new ElementTreeSelectionDialog(shell, new WorkbenchLabelProvider(), new WorkbenchContentProvider());
-    dialog.setTitle(title);
-    dialog.setMessage(title);
-    dialog.setBlockOnOpen(true);
-    dialog.setAllowMultiple(false);
-    dialog.setInput(ScalastylePlugin.getWorkspace().getRoot());
+    dialog.setTitle(title)
+    dialog.setMessage(title)
+    dialog.setBlockOnOpen(true)
+    dialog.setAllowMultiple(false)
+    // TODO add initial selection
+//    val initial = file match {
+//      case Some(name) => name
+//      case None => null
+//    }
+//    dialog.setInitialSelection(initial)
+    dialog.setInput(ScalastylePlugin.getWorkspace().getRoot())
     
     dialog.setValidator(new ISelectionStatusValidator() {
       def validate(selection: Array[Object]): IStatus = {

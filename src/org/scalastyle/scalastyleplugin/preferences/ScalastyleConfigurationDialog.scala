@@ -15,6 +15,7 @@ import org.eclipse.jface.viewers._
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.window.Window;
 import org.scalastyle.scalastyleplugin.ScalastylePlugin;
+import org.scalastyle.scalastyleplugin.SwtUtils._
 
 case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChecker: Option[ConfigurationChecker]) {
   def enabled = _configurationChecker.isDefined && _configurationChecker.get.enabled
@@ -65,8 +66,6 @@ case class Model(definition: ScalastyleDefinition, configuration: ScalastyleConf
 case class DialogColumn(name: String, alignment: Int, sorter: TableSorter[ModelChecker, String], weight: Int, getText: (ModelChecker) => String)
 
 class ScalastyleConfigurationDialog(parent: Shell, file: String) extends TitleAreaDialog(parent) {
-  import ScalastyleUI._;
-
   setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX)
   val classLoader = this.getClass().getClassLoader()
   val definition = ScalastyleDefinition.readFromXml(classLoader.getResourceAsStream("/scalastyle_definition.xml"))
@@ -92,17 +91,15 @@ class ScalastyleConfigurationDialog(parent: Shell, file: String) extends TitleAr
   private[this] def string(map: Map[String, String]): String = map.map(cp => cp._1 + "=" + cp._2).mkString(",")
 
   override def createDialogArea(parent: Composite): Control = {
-    val composite = super.createDialogArea(parent).asInstanceOf[Composite];
-
-    val contents = new Composite(composite, SWT.NULL);
-    contents.setLayoutData(new GridData(GridData.FILL_BOTH));
-    contents.setLayout(new GridLayout());
+    // TODO set width
+    val contents = composite(parent, gridData());
 
     label(contents, "Name")
     nameText = text(contents, model.configuration.name, true, false)
     
-    val tableControl = configTable(contents, model.configuration);
-    tableControl.setLayoutData(new GridData(GridData.FILL_BOTH));
+    val checkerGroup = group(contents, "Checkers");
+
+    table(checkerGroup)
 
     editButton = button(contents, "Edit", false, { editChecker(currentSelection) })
 
@@ -149,14 +146,8 @@ class ScalastyleConfigurationDialog(parent: Shell, file: String) extends TitleAr
     super.okPressed();
   }
 
-
-  private[this] def configTable(parent: Composite, configuration: ScalastyleConfiguration) = {
-    val group = new Group(parent, SWT.NULL)
-    group.setLayout(new GridLayout())
-    group.setText("Checkers")
-    // TODO set width
-
-    val table = new Table(group, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION)
+  private[this] def table(parent: Composite): Table = {
+    val table = new Table(parent, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION)
     table.setLayoutData(new GridData(GridData.FILL_BOTH))
     table.setHeaderVisible(true)
     table.setLinesVisible(true)
@@ -167,12 +158,12 @@ class ScalastyleConfigurationDialog(parent: Shell, file: String) extends TitleAr
     tableViewer = new TableViewer(table);
 
     val editors: Array[CellEditor] = columns.map(c => {
-      column(table, tableViewer, c.name, c.alignment, c.sorter)
+      column(table, tableViewer, c.name, c.alignment, c.sorter, refresh)
       tableLayout.addColumnData(new ColumnWeightData(c.weight))
       textEditor(table)
     });
 
-    val f = new PropertiesLabelProvider(tableViewer, messageHelper, configuration, columns)
+    val f = new PropertiesLabelProvider(tableViewer, messageHelper, columns)
     tableViewer.setLabelProvider(f)
     tableViewer.setContentProvider(new ArrayContentProvider())
     tableViewer.setInput(model)
@@ -185,26 +176,11 @@ class ScalastyleConfigurationDialog(parent: Shell, file: String) extends TitleAr
         setSelection(ss.getFirstElement().asInstanceOf[ModelChecker])
       }
     });
+    
+    table
 
-    group
   }
 
-  private[this] def column(table: Table, tableViewer: TableViewer, text: String, alignment: Int, tableSorter: TableSorter[ModelChecker, String]): TableColumn = {
-    val column = new TableColumn(table, SWT.NULL)
-    column.setAlignment(alignment)
-    column.setText(text)
-
-    column.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-      override def widgetSelected(e: SelectionEvent): Unit = {
-        if (tableSorter != null) {
-          tableViewer.setSorter(tableSorter.flip())
-          refresh();
-        }
-      }
-    })
-
-    column
-  }
 }
 
 class ModelContentProvider(model: Model) extends IStructuredContentProvider {
@@ -213,7 +189,7 @@ class ModelContentProvider(model: Model) extends IStructuredContentProvider {
   def getElements(parent: Object): Array[java.lang.Object] = Array[java.lang.Object](model.checkers: _*)
 }
 
-class PropertiesLabelProvider(tableViewer: TableViewer, messageHelper: MessageHelper, configuration: ScalastyleConfiguration, columns: Array[DialogColumn]) extends LabelProvider with ITableLabelProvider {
+class PropertiesLabelProvider(tableViewer: TableViewer, messageHelper: MessageHelper, columns: Array[DialogColumn]) extends LabelProvider with ITableLabelProvider {
   def getColumnImage(element: Any, columnIndex: Int): Image = null
 
   def getColumnText(element: java.lang.Object, columnIndex: Int): String = {
@@ -233,17 +209,4 @@ object TableSorter {
   val ClassSorter = new TableSorter[ModelChecker, String](_.definitionChecker.className, true)
   val ParamsSorter = new TableSorter[ModelChecker, String](_.definitionChecker.parameters.toString, true)
   val CommentSorter = new TableSorter[ModelChecker, String](_.definitionChecker.className, true)
-}
-
-class TableSorter[T, B <: java.lang.Comparable[B]](fn: (T) => B, var asc: Boolean) extends ViewerSorter {
-  var mult = if (asc) 1 else -1
-  def flip(): this.type = {
-    asc = !asc
-    mult = mult * -1
-    this
-  }
-
-  override def compare(viewer: Viewer, o1: java.lang.Object, o2: java.lang.Object): Int = {
-    fn(o1.asInstanceOf[T]).compareTo(fn(o2.asInstanceOf[T])) * mult
-  }
 }

@@ -6,9 +6,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout._;
 import org.eclipse.swt.events._;
 import org.segl.scalastyle._;
+import org.scalastyle.scalastyleplugin.SwtUtils._;
 
 class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, modelChecker: ModelChecker) extends TitleAreaDialog(parent) {
-  import ScalastyleUI._;
   setShellStyle(getShellStyle() | SWT.RESIZE);
   var resetButton: Button = _
   var enabledCheckbox: Button = _
@@ -16,18 +16,14 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
   var parameterControls = Map[String, Text]()
 
   override def createDialogArea(parent: Composite): Control = {
-    val composite = super.createDialogArea(parent).asInstanceOf[Composite];
+    val dialogArea = super.createDialogArea(parent).asInstanceOf[Composite];
 
-    val contents = new Composite(composite, SWT.NULL);
-    contents.setLayoutData(new GridData(GridData.FILL_BOTH));
-    contents.setLayout(gridLayout(1));
+    val contents = composite(dialogArea, gridData(GridData.FILL_BOTH), layout = gridLayout(1));
 
-    val allContents = new Composite(contents, SWT.NULL);
-    allContents.setLayoutData(new GridData(GridData.FILL_BOTH));
-    allContents.setLayout(gridLayout(2));
+    val allContents = composite(contents, layout = gridLayout(2));
 
     // TODO make it look nice
-    // TODO add description
+    // TODO all text to scalastyle_messages.properties
 
     val id = modelChecker.definitionChecker.id
     label(allContents, "Id")
@@ -46,12 +42,11 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
     severityCombo = combo(allContents, Array("warning", "error"), modelChecker.configurationChecker.level.name)
 
     if (modelChecker.configurationChecker.parameters.size > 0) {
-      val parameterGroup = group(contents, "Parameters")
+      val parameterGroup = group(contents, "Parameters", layout = gridLayout(2), gridData = gridData(GridData.FILL_HORIZONTAL))
 
       parameterControls = modelChecker.configurationChecker.parameters.map({
         case (name, value) => {
           label(parameterGroup, messageHelper.label(id + "." + name))
-          println("modelChecker.typeOf(name)=" + modelChecker.typeOf(name))
           (name, text(parameterGroup, value, true, modelChecker.typeOf(name) == "multistring", messageHelper.description(id + "." + name)))
         }
       })
@@ -63,6 +58,7 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
   }
 
   private[this] def reset() = {
+    // TODO reset
     println("reset")
   }
   
@@ -76,85 +72,5 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
     modelChecker.set(level, enabled, parameters)
     
     super.okPressed()
-  }
-}
-
-object ScalastyleUI {
-  def button(parent: Composite, text: String, enabled: Boolean, fn: => Unit) = {
-    val button = new Button(parent, SWT.PUSH);
-    button.setText(text);
-    button.setEnabled(enabled);
-    val gd = new GridData();
-    button.setLayoutData(gd);
-
-    button.addSelectionListener(new SelectionListener() {
-      def widgetSelected(e: SelectionEvent): Unit = fn
-      def widgetDefaultSelected(e: SelectionEvent): Unit = {}
-    });
-
-    button
-  }
-
-  def label(parent: Composite, text: String): Label = {
-    val label = new Label(parent, SWT.NULL)
-
-    label.setText(text)
-    label.setLayoutData(new GridData())
-
-    label
-  }
-
-  def text(parent: Composite, defaultText: String, editable: Boolean, multiLine: Boolean, tooltip: String = null): Text = {
-    val text = new Text(parent, SWT.LEFT | (if (multiLine) SWT.MULTI else SWT.SINGLE) | SWT.BORDER)
-
-    text.setEditable(editable)
-    text.setText(defaultText);
-
-    val gridData =
-      new GridData(
-        GridData.FILL_BOTH | GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_FILL);
-    
-    if (multiLine) {
-    	gridData.heightHint = 200;
-    }
-    
-    gridData.grabExcessVerticalSpace = true;
-
-    text.setLayoutData(gridData);
-    text.setToolTipText(tooltip);
-
-    text
-  }
-
-  def checkbox(parent: Composite, checked: Boolean): Button = {
-    val checkbox = new Button(parent, SWT.CHECK)
-
-    checkbox.setSelection(checked)
-    checkbox.setLayoutData(new GridData())
-
-    checkbox
-  }
-
-  def combo(parent: Composite, list: Array[String], value: String): Combo = {
-    val combo = new Combo(parent, SWT.NONE | SWT.DROP_DOWN | SWT.READ_ONLY);
-    combo.setLayoutData(new GridData());
-    combo.setItems(list);
-    combo.select(list.indexOf(value));
-
-    combo
-  }
-
-  def group(parent: Composite, text: String): Group = {
-    val group = new Group(parent, SWT.NULL)
-    group.setLayout(gridLayout(2))
-    group.setLayoutData(new GridData(GridData.FILL_BOTH))
-    group.setText(text)
-    group
-  }
-
-  def gridLayout(columns: Int): GridLayout = {
-    val gridLayout = new GridLayout()
-    gridLayout.numColumns = columns
-    gridLayout
   }
 }
