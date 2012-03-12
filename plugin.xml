@@ -15,9 +15,7 @@
          name="%ScalastyleNature.name"
          point="org.eclipse.core.resources.natures">
       <runtime>
-         <run
-               class="org.scalastyle.scalastyleplugin.nature.ScalastyleNature">
-         </run>
+         <run class="org.scalastyle.scalastyleplugin.nature.ScalastyleNature" />
       </runtime>
    </extension>
    <extension
@@ -48,17 +46,17 @@
          point="org.eclipse.ui.editors.annotationTypes">
       <type
             name="org.scalastyle.scalastyleplugin.error"         
-            markerType="org.scalastyle.scalastyleplugin.ScalastyleMarker"
+            markerType="org.scalastyle.scalastyleplugin.builder.ScalastyleMarker"
             markerSeverity="2">
       </type>
       <type
             name="org.scalastyle.scalastyleplugin.info"         
-            markerType="org.scalastyle.scalastyleplugin.ScalastyleMarker"
+            markerType="org.scalastyle.scalastyleplugin.builder.ScalastyleMarker"
             markerSeverity="1">
       </type>
       <type
             name="org.scalastyle.scalastyleplugin.info"         
-            markerType="org.scalastyle.scalastyleplugin.ScalastyleMarker"
+            markerType="org.scalastyle.scalastyleplugin.builder.ScalastyleMarker"
             markerSeverity="0">
       </type>
    </extension>

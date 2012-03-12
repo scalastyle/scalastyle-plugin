@@ -17,8 +17,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.workbench.texteditor,
  org.eclipse.ui.editors,
  org.eclipse.team.cvs.core,
- org.eclipse.team.core,
- org.eclipse.core.filesystem;bundle-version="1.3.1"
+ org.eclipse.team.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/scalariform_2.9.1-0.1.1.jar,

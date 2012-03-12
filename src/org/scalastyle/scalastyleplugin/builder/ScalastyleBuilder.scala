@@ -181,9 +181,7 @@ class EclipseOutput extends Output[EclipseFileSpec] {
   }
 
   private def addError(messageHelper: MessageHelper, error: StyleError[EclipseFileSpec]): Unit = {
-    println("error file=" + error.fileSpec.name + " key=" + error.key + " lineNumber=" + error.lineNumber + " column=" + error.column)
     // TODO limit number of errors, do we limit number of errors and number of warnings? or both together
-
     // TODO rule metadata
 
     val severity = error.level match {
@@ -196,7 +194,7 @@ class EclipseOutput extends Output[EclipseFileSpec] {
       ScalastyleMarker.MessageKey -> error.key,
       IMarker.PRIORITY -> IMarker.PRIORITY_NORMAL,
       IMarker.SEVERITY -> severity,
-      "categoryId" -> 998)
+      "categoryId" -> 999)
 
     MarkerUtilities.setLineNumber(markerAttributes, error.lineNumber.getOrElse(1));
     MarkerUtilities.setMessage(markerAttributes, messageHelper.message(error.clazz.getClassLoader(), error.key, error.args));
@@ -204,5 +202,4 @@ class EclipseOutput extends Output[EclipseFileSpec] {
     // create a marker for the file
     MarkerUtilities.createMarker(error.fileSpec.resource, markerAttributes, ScalastyleMarker.MarkerId)
   }
-
 }
