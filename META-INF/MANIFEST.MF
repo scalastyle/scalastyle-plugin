@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Scalastyle-plugin
-Bundle-SymbolicName: scalastyle-plugin; singleton:=true
+Bundle-Name: Scalastyle Plugin
+Bundle-SymbolicName: org.scalastyle.scalastyleplugin; singleton:=true
 Bundle-Version: 0.0.1.qualifier
 Bundle-Activator: org.scalastyle.scalastyleplugin.ScalastylePlugin
 Bundle-Vendor: Scalastyle

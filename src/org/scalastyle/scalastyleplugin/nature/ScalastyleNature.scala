@@ -30,7 +30,7 @@ import org.scalastyle.scalastyleplugin.builder.ScalastyleBuilder
 import org.scalastyle.scalastyleplugin.builder.ScalastyleMarker
 
 object ScalastyleNature {
-  val NATURE_ID = ScalastylePlugin.PLUGIN_ID + ".ScalastyleNature"
+  val NatureId = ScalastylePlugin.PluginId + ".ScalastyleNature"
   val ScalaBuilderId = "org.scala-ide.sdt.core.scalabuilder"
 
   /**
@@ -42,7 +42,7 @@ object ScalastyleNature {
     val commands = project.getDescription().getBuildSpec()
 
     var scalaBuilderIndex = builderIndex(commands, ScalaBuilderId)
-    var scalastyleBuilderIndex = builderIndex(commands, ScalastyleBuilder.BUILDER_ID)
+    var scalastyleBuilderIndex = builderIndex(commands, ScalastyleBuilder.BuilderId)
 
     scalaBuilderIndex < scalastyleBuilderIndex
   }
@@ -57,10 +57,10 @@ class ScalastyleNature extends IProjectNature {
     val description = project.getDescription();
     val commands = description.getBuildSpec();
 
-    if (!commands.exists(c => c.getBuilderName().equals(ScalastyleBuilder.BUILDER_ID))) {
+    if (!commands.exists(c => c.getBuilderName().equals(ScalastyleBuilder.BuilderId))) {
       // add builder to project
       val command = description.newCommand();
-      command.setBuilderName(ScalastyleBuilder.BUILDER_ID);
+      command.setBuilderName(ScalastyleBuilder.BuilderId);
 
       description.setBuildSpec(commands :+ command);
       project.setDescription(description, new NullProgressMonitor())
@@ -71,13 +71,13 @@ class ScalastyleNature extends IProjectNature {
     val description = project.getDescription();
     val commands = description.getBuildSpec();
 
-    val newCommands = commands.filter(c => !c.getBuilderName().equals(ScalastyleBuilder.BUILDER_ID))
+    val newCommands = commands.filter(c => !c.getBuilderName().equals(ScalastyleBuilder.BuilderId))
 
     description.setBuildSpec(newCommands);
     project.setDescription(description, new NullProgressMonitor());
 
     // remove markers from the project
-    getProject().deleteMarkers(ScalastyleMarker.MARKER_ID, true, IResource.DEPTH_INFINITE);
+    getProject().deleteMarkers(ScalastyleMarker.MarkerId, true, IResource.DEPTH_INFINITE);
   }
 
   def getProject: IProject = project

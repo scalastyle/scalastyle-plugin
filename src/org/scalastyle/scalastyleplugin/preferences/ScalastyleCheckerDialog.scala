@@ -21,8 +21,10 @@ import org.eclipse.swt.widgets._;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout._;
 import org.eclipse.swt.events._;
+import org.eclipse.jface.dialogs._;
 import org.scalastyle._;
 import org.scalastyle.scalastyleplugin.SwtUtils._;
+import org.scalastyle.scalastyleplugin.StringUtils._;
 
 class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, modelChecker: ModelChecker) extends TitleAreaDialog(parent) {
   setShellStyle(getShellStyle() | SWT.RESIZE);
@@ -68,25 +70,39 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
       })
     }
 
-    resetButton = button(contents, "Reset", true, { reset() })
-
     contents
   }
 
-  private[this] def reset() = {
-    // TODO reset
-    println("reset")
-  }
+  def isNumeric(s: String): Boolean = s.forall(_.isDigit)
 
   override def okPressed(): Unit = {
-    // TODO validation please
     val enabled = enabledCheckbox.getSelection()
     val level = Level(severityCombo.getItem(severityCombo.getSelectionIndex()))
 
-    val parameters = parameterControls.map({case (name, text) => (name, text.getText())}).toMap
+    val errors = parameterControls.flatMap(s => s match {
+      case (name, text) => {
+        val contents = text.getText()
+        val error = if (isEmpty(contents)) {
+          Some((name, "must have a value"))
+        } else {
+          modelChecker.typeOf(name) match {
+            case IntegerType => if (!isNumeric(contents)) Some((name, "must be an integer")) else None
+            case StringType => None
+          }
+        }
+        error
+      }
+    })
 
-    modelChecker.set(level, enabled, parameters)
+    if (errors.size > 0) {
+      val message = errors.map({ case (name, message) => "Parameter " + name + " " + message }).mkString("\n")
+      MessageDialog.open(MessageDialog.ERROR, getShell(), "Scalastyle parameter error", message, SWT.OK)
+    } else {
+      val parameters = parameterControls.map({ case (name, text) => (name, text.getText()) }).toMap
 
-    super.okPressed()
+      modelChecker.set(level, enabled, parameters)
+
+      super.okPressed()
+    }
   }
 }

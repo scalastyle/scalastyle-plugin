@@ -106,9 +106,7 @@ class ScalastylePropertyPage extends PropertyPage {
   }
 
   override def setElement(element: IAdaptable): Unit = {
-    val project = element.asInstanceOf[IProject]
-    println("project=" + project.getName())
-    this.project = project
+    this.project = element.asInstanceOf[IProject]
   }
 
   private[this] def toArray(configurations: WorkspaceConfigurations): Array[String] = {

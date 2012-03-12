@@ -64,14 +64,13 @@ import org.scalastyle.scalastyleplugin.SwtUtils._
 import org.scalastyle._
 import org.eclipse.jface.viewers.TableViewer
 
-case class Configuration(name: String, location: String) extends TableLine
+case class Configuration(location: String) extends TableLine
 
 case class Configurations(var elements: List[Configuration]) extends Container[Configuration]
 
 class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferencePage {
   setPreferenceStore(ScalastylePlugin.getDefault().getPreferenceStore())
 
-  val NameSorter = new TableSorter[Configuration, String](_.name, true)
   val LocationSorter = new TableSorter[Configuration, String](_.location, true)
   val classLoader = this.getClass().getClassLoader()
   val messageHelper = new MessageHelper(classLoader)
@@ -83,8 +82,7 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
   var tableViewer: TableViewer = _
 
   private[this] val columns = List(
-    DialogColumn[Configuration]("Name", SWT.LEFT, NameSorter, 30, { _.name }),
-    DialogColumn[Configuration]("Location", SWT.LEFT, LocationSorter, 70, { _.location })
+    DialogColumn[Configuration]("Location", SWT.LEFT, LocationSorter, 100, { _.location })
   )
 
   def createContents(parent: Composite): Control = {
@@ -121,7 +119,7 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
 
   def addConfiguration(file: IFile) = {
     println("add configuration" + file.getFullPath().toString())
-    model.elements = model.elements ::: List(Configuration("name", file.getFullPath().toString()))
+    model.elements = model.elements ::: List(Configuration(file.getFullPath().toString()))
     refresh()
   }
 
@@ -192,7 +190,7 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
   }
 
   def toConfigurations(workspaceConfigurations: WorkspaceConfigurations) = {
-    Configurations(workspaceConfigurations.configurations.map(c => Configuration("name", c.file)))
+    Configurations(workspaceConfigurations.configurations.map(c => Configuration(c.file)))
   }
 
   def toWorkspaceConfigurations(configurations: Configurations) = {

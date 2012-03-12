@@ -38,11 +38,12 @@ class BuildProjectJob(projects: Array[IProject], kind: Int, message: String) ext
 
     try {
       projects.foreach(project => {
-        if (project.isOpen() && project.hasNature(ScalastyleNature.NATURE_ID)) {
+        if (project.isOpen() && project.hasNature(ScalastyleNature.NatureId)) {
           project.build(kind, monitor);
         }
       })
     } catch {
+      // TODO improve error handling here
       case e: CoreException => status = e.getStatus()
     } finally {
       monitor.done();

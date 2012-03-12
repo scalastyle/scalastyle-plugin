@@ -42,12 +42,12 @@ import org.scalastyle.scalastyleplugin.config._
 import org.scalastyle.ScalastyleChecker
 import org.scalastyle._
 import scala.collection.JavaConversions._
+import org.eclipse.jface.dialogs.MessageDialog
 
 class EclipseFileSpec(val name: String, val resource: IResource) extends FileSpec
 
 object ScalastyleBuilder {
-  /** Eclipse extension point ID for the builder. */
-  val BUILDER_ID = ScalastylePlugin.PLUGIN_ID + ".ScalastyleBuilder" //$NON-NLS-1$
+  val BuilderId = ScalastylePlugin.PluginId + ".ScalastyleBuilder" //$NON-NLS-1$
 
   def buildProject(project: IProject) = {
     val buildJob = BuildProjectJob(project, IncrementalProjectBuilder.FULL_BUILD)
@@ -64,7 +64,7 @@ object ScalastyleBuilder {
 
   def buildProjects(projects: Array[IProject]) = {
     val scalastyleProjects = projects.filter(project => {
-      project.exists() && project.isOpen() && project.hasNature(ScalastyleNature.NATURE_ID) && Persistence.loadWorkspace().configurations.size > 0
+      project.exists() && project.isOpen() && project.hasNature(ScalastyleNature.NatureId) && Persistence.loadWorkspace().configurations.size > 0
     })
 
     val buildJob = BuildProjectJob(scalastyleProjects, IncrementalProjectBuilder.FULL_BUILD)
@@ -79,7 +79,7 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
     val project = getProject();
 
     // remove project level error markers
-    project.deleteMarkers(ScalastyleMarker.MARKER_ID, false, IResource.DEPTH_ZERO);
+    project.deleteMarkers(ScalastyleMarker.MarkerId, false, IResource.DEPTH_ZERO);
 
     if (ScalastyleNature.hasCorrectBuilderOrder(project)) {
       val resourceDelta = getDelta(project);
@@ -90,7 +90,7 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
       // the builder order is wrong. Refuse to check and create a error.
 
       // remove all existing markers
-      project.deleteMarkers(ScalastyleMarker.MARKER_ID, false, IResource.DEPTH_INFINITE);
+      project.deleteMarkers(ScalastyleMarker.MarkerId, false, IResource.DEPTH_INFINITE);
 
       // categoryId enables own category under Java Problem Type
       // setting for Problems view (RFE 1530366)
@@ -100,7 +100,7 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
         "categoryId" -> Integer.valueOf(999));
 
       // create a marker for the project
-      MarkerUtilities.createMarker(project, markerAttributes, ScalastyleMarker.MARKER_ID);
+      MarkerUtilities.createMarker(project, markerAttributes, ScalastyleMarker.MarkerId);
     }
 
     Array(project)
@@ -111,15 +111,16 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
 
     // on full build remove all markers
     if (kind == IncrementalProjectBuilder.FULL_BUILD) {
-      project.deleteMarkers(ScalastyleMarker.MARKER_ID, false, IResource.DEPTH_INFINITE);
+      project.deleteMarkers(ScalastyleMarker.MarkerId, false, IResource.DEPTH_INFINITE);
     }
 
     try {
       val projectConfiguration = Persistence.loadProject(project)
       if (projectConfiguration.enabled && projectConfiguration.file.isDefined) {
-//        val file = project.getFile(projectConfiguration.file.get).getLocation().toFile().getAbsolutePath()
+
         val file = Persistence.findConfiguration(projectConfiguration.file.get)
         if (file.isDefined && !file.get.exists) {
+          // TODO message
           println("can't find " + file.get.getAbsolutePath())
         } else {
             val configuration = ScalastyleConfiguration.readFromXml(file.get.getAbsolutePath())
@@ -133,7 +134,7 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
       }
     } catch {
       // TODO probably add something to the error log and marker?
-      case e: Exception => throw new CoreException(new Status(IStatus.ERROR, ScalastylePlugin.PLUGIN_ID, IStatus.ERROR, e.getLocalizedMessage(), e))
+      case e: Exception => throw new CoreException(new Status(IStatus.ERROR, ScalastylePlugin.PluginId, IStatus.ERROR, e.getLocalizedMessage(), e))
     }
   }
 
@@ -171,10 +172,10 @@ class EclipseOutput extends Output[EclipseFileSpec] {
     case EndWork() => {}
     case StartFile(file) => {
       // remove markers on this file
-      file.resource.deleteMarkers(ScalastyleMarker.MARKER_ID, false, IResource.DEPTH_ZERO);
+      file.resource.deleteMarkers(ScalastyleMarker.MarkerId, false, IResource.DEPTH_ZERO);
 
       // remove markers from package as well, not sure if this is necessary
-      file.resource.getParent().deleteMarkers(ScalastyleMarker.MARKER_ID, false, IResource.DEPTH_ZERO);
+      file.resource.getParent().deleteMarkers(ScalastyleMarker.MarkerId, false, IResource.DEPTH_ZERO);
     }
     case EndFile(file) => {}
     case error: StyleError[_] => addError(messageHelper, error)
@@ -196,8 +197,8 @@ class EclipseOutput extends Output[EclipseFileSpec] {
         case _ => IMarker.SEVERITY_WARNING
       }
 
-      val markerAttributes: java.util.Map[String, Any] = HashMap(ScalastyleMarker.MODULE_NAME -> "module",
-        ScalastyleMarker.MESSAGE_KEY -> error.key,
+      val markerAttributes: java.util.Map[String, Any] = HashMap(ScalastyleMarker.ModuleName -> "module",
+        ScalastyleMarker.MessageKey -> error.key,
         IMarker.PRIORITY -> IMarker.PRIORITY_NORMAL,
         IMarker.SEVERITY -> severity,
         "categoryId" -> 998)
@@ -206,7 +207,7 @@ class EclipseOutput extends Output[EclipseFileSpec] {
       MarkerUtilities.setMessage(markerAttributes, messageHelper.message(error.clazz.getClassLoader(), error.key, error.args));
 
       // create a marker for the file
-      MarkerUtilities.createMarker(error.fileSpec.resource, markerAttributes, ScalastyleMarker.MARKER_ID)
+      MarkerUtilities.createMarker(error.fileSpec.resource, markerAttributes, ScalastyleMarker.MarkerId)
     } catch {
       case _ =>
       // TODO log exception

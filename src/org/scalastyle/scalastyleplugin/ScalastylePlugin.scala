@@ -23,14 +23,13 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.IWorkspace;
 
 object ScalastylePlugin {
-  val PLUGIN_ID = "scalastyle-plugin" //$NON-NLS-1$
-  val PreferenceConfigurationFile = "scalastyle.preferenceConfigurationFile"
+  val PluginId = "org.scalastyle.scalastyleplugin"
 
   private var plugin: ScalastylePlugin = _
 
   def getDefault(): ScalastylePlugin = plugin
 
-  def getImageDescriptor(path: String): ImageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path)
+  def getImageDescriptor(path: String): ImageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(PluginId, path)
 
   def getWorkspace(): IWorkspace = ResourcesPlugin.getWorkspace();
 }

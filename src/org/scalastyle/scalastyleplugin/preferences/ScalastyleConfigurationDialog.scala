@@ -32,6 +32,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.window.Window;
 import org.scalastyle.scalastyleplugin.ScalastylePlugin;
 import org.scalastyle.scalastyleplugin.SwtUtils._
+import org.scalastyle.scalastyleplugin.StringUtils._
 import org.scalastyle.scalastyleplugin.config.Persistence
 
 case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChecker: Option[ConfigurationChecker]) extends TableLine {
@@ -44,7 +45,7 @@ case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChec
     dirty = true
   }
 
-  def typeOf(name: String) = {
+  def typeOf(name: String): ParameterType = {
     definitionChecker.parameters.get(name).get.typeName
   }
 
@@ -98,21 +99,18 @@ class ScalastyleConfigurationDialog(parent: Shell, filename: String) extends Tit
   val SeveritySorter = new TableSorter[ModelChecker, String](_.definitionChecker.level.name, true)
   val ClassSorter = new TableSorter[ModelChecker, String](_.definitionChecker.className, true)
   val ParamsSorter = new TableSorter[ModelChecker, String](_.definitionChecker.parameters.toString, true)
-  val CommentSorter = new TableSorter[ModelChecker, String](_.definitionChecker.className, true)
 
   private[this] val columns = List(
     DialogColumn[ModelChecker]("Enabled", SWT.LEFT, null, 15, { mc => if (mc.configurationChecker.enabled) "true" else "false" }),
-    DialogColumn[ModelChecker]("Name", SWT.LEFT, NameSorter, 15, { mc => messageHelper.label(mc.definitionChecker.id) }),
+    DialogColumn[ModelChecker]("Name", SWT.LEFT, NameSorter, 35, { mc => messageHelper.label(mc.definitionChecker.id) }),
     DialogColumn[ModelChecker]("Severity", SWT.LEFT, SeveritySorter, 15, { mc => messageHelper.text(mc.configurationChecker.level.name) }),
-    DialogColumn[ModelChecker]("Params", SWT.LEFT, ParamsSorter, 15, { mc => string(mc.configurationChecker.parameters) }),
-    DialogColumn[ModelChecker]("Class", SWT.LEFT, ClassSorter, 15, { mc => mc.definitionChecker.className }),
-    DialogColumn[ModelChecker]("Comments", SWT.LEFT, CommentSorter, 15, { mc => "" })
+    DialogColumn[ModelChecker]("Params", SWT.LEFT, ParamsSorter, 20, { mc => string(mc.configurationChecker.parameters) }),
+    DialogColumn[ModelChecker]("Class", SWT.LEFT, ClassSorter, 15, { mc => mc.definitionChecker.className })
   )
 
   private[this] def string(map: Map[String, String]): String = map.map(cp => cp._1 + "=" + cp._2).mkString(",")
 
   override def createDialogArea(parent: Composite): Control = {
-    // TODO set width
     val contents = composite(parent, Some(gridData()));
 
     label(contents, "Name")
@@ -129,8 +127,6 @@ class ScalastyleConfigurationDialog(parent: Shell, filename: String) extends Tit
   }
 
   private[this] def refresh() = {
-    println("refresh")
-    // TODO check that true, true is ok
     tableViewer.refresh(true, true)
   }
 
@@ -150,18 +146,16 @@ class ScalastyleConfigurationDialog(parent: Shell, filename: String) extends Tit
   }
 
   override def okPressed(): Unit = {
-    // TODO validation please
-    println("ok pressed")
-
-    if (nameText.getText() == "") {
-      println("message please")
+    if (isEmpty(nameText.getText())) {
+      val message = "Name must have a value"
+      MessageDialog.open(MessageDialog.ERROR, getShell(), "Scalastyle configuration error", message, SWT.OK)
+    } else {
+        if (nameText.getText() != model.configuration.name || model.dirty) {
+    
+          println("writing")
+          Persistence.saveConfiguration(file.get.getAbsolutePath(), model.toConfiguration(nameText.getText()))
+        }
+        super.okPressed();
     }
-
-    if (nameText.getText() != model.configuration.name || model.dirty) {
-
-      println("writing")
-      Persistence.saveConfiguration(file.get.getAbsolutePath(), model.toConfiguration(nameText.getText()))
-    }
-    super.okPressed();
   }
 }

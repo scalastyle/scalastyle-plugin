@@ -132,7 +132,6 @@ object Persistence {
     }
   }
 
-
   // TODO change filename to an IFile?
   private[this] def write(filename: String, elem: Elem, width: Int, step: Int): Unit = {
     println("writing to " + filename)

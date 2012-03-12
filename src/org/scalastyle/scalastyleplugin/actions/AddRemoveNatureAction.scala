@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.Status
 import org.eclipse.jface.action.IAction
 import org.eclipse.jface.viewers.ISelection
 import org.eclipse.jface.viewers.IStructuredSelection
+import org.eclipse.jface.dialogs.MessageDialog
 import org.eclipse.ui.IObjectActionDelegate
 import org.eclipse.ui.IWorkbenchPart
 import org.eclipse.core.resources.IProject;
@@ -63,8 +64,8 @@ class AddScalastyleNatureAction extends ScalastyleNatureAction {
     def runInWorkspace(monitor: IProgressMonitor): IStatus = {
 
       projects.foreach(project => {
-        if (project.isOpen() && !project.hasNature(ScalastyleNature.NATURE_ID)) {
-          new AddNatureJob(project, ScalastyleNature.NATURE_ID).schedule()
+        if (project.isOpen() && !project.hasNature(ScalastyleNature.NatureId)) {
+          new AddNatureJob(project, ScalastyleNature.NatureId).schedule()
         }
       });
 
@@ -75,8 +76,10 @@ class AddScalastyleNatureAction extends ScalastyleNatureAction {
   class AddNatureJob(project: IProject, natureId: String) extends AddRemoveNatureJob(natureId, Messages.addNatureToProjectJob) {
     def runInWorkspace(monitor: IProgressMonitor): IStatus = {
       runInWorkspace(monitor, {
+        println("natureId=" + natureId)
         val desc = project.getDescription()
         desc.setNatureIds(desc.getNatureIds() ++ Array(natureId))
+        desc.getNatureIds().foreach(ni => println(ni))
         project.setDescription(desc, monitor)
       })
     }
@@ -89,18 +92,20 @@ class RemoveScalastyleNatureAction extends ScalastyleNatureAction {
   class RemoveNatureJobs(projects: Array[IProject]) extends WorkspaceJob(Messages.removeNatureFromProjectsJob) {
     def runInWorkspace(monitor: IProgressMonitor): IStatus = {
       projects.foreach(project => {
-        if (project.isOpen() && project.hasNature(ScalastyleNature.NATURE_ID)) {
-          new RemoveNatureJob(project, ScalastyleNature.NATURE_ID).schedule()
+        if (project.isOpen() && project.hasNature(ScalastyleNature.NatureId)) {
+          new RemoveNatureJob(project, ScalastyleNature.NatureId).schedule()
         }
       });
 
       Status.OK_STATUS;
     }
   }
+
   class RemoveNatureJob(project: IProject, natureId: String) extends AddRemoveNatureJob(natureId, Messages.removeNatureFromProjectJob) {
     def runInWorkspace(monitor: IProgressMonitor): IStatus = {
       runInWorkspace(monitor, {
         val desc = project.getDescription()
+        println("natureId=" + natureId)
         desc.setNatureIds(desc.getNatureIds().filter(_ != natureId))
         project.setDescription(desc, monitor)
       })
