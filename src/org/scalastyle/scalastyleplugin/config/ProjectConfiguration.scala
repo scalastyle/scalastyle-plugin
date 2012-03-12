@@ -101,8 +101,6 @@ object Persistence {
     } else {
       ProjectConfiguration(false, None)
     }
-
-    // TODO error handling please
   }
 
   def toXml(projectConfiguration: ProjectConfiguration): scala.xml.Elem = {
@@ -134,7 +132,6 @@ object Persistence {
 
   // TODO change filename to an IFile?
   private[this] def write(filename: String, elem: Elem, width: Int, step: Int): Unit = {
-    println("writing to " + filename)
     val s = new XmlPrettyPrinter(width, step).format(elem)
 
     var out: java.io.Writer = null;
@@ -143,14 +140,14 @@ object Persistence {
       out = new java.io.BufferedWriter(new java.io.FileWriter(filename))
       out.write(s)
     } catch {
-      case e => throw e // TODO do something here
+      case e => throw e
     } finally {
       try {
         if (out != null) {
           out.close();
         }
       } catch {
-        case _ => // do nothing
+        case _ => // do nothing, just ignore
       }
     }
   }

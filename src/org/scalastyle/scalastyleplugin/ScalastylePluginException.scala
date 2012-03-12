@@ -18,6 +18,7 @@ package org.scalastyle.scalastyleplugin
 
 object ScalastylePluginException {
   def apply(message: String, cause: Throwable) = new ScalastylePluginException(message, cause)
+  def apply(message: String) = new ScalastylePluginException(message, null)
   def rethrow(t: Throwable, message: String): Unit = {
     t match {
       case s: ScalastylePluginException => throw s

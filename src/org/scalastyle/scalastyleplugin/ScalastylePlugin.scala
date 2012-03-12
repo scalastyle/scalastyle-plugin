@@ -32,6 +32,8 @@ object ScalastylePlugin {
   def getImageDescriptor(path: String): ImageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(PluginId, path)
 
   def getWorkspace(): IWorkspace = ResourcesPlugin.getWorkspace();
+
+  lazy val PluginLogo = getImageDescriptor("icons/scalastyle-logo.png").createImage()
 }
 
 /**

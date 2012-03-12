@@ -33,6 +33,7 @@ import org.eclipse.jface.window.Window;
 import org.scalastyle.scalastyleplugin.ScalastylePlugin;
 import org.scalastyle.scalastyleplugin.SwtUtils._
 import org.scalastyle.scalastyleplugin.StringUtils._
+import org.scalastyle.scalastyleplugin.ExceptionUtils._
 import org.scalastyle.scalastyleplugin.config.Persistence
 
 case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChecker: Option[ConfigurationChecker]) extends TableLine {
@@ -111,10 +112,12 @@ class ScalastyleConfigurationDialog(parent: Shell, filename: String) extends Tit
   private[this] def string(map: Map[String, String]): String = map.map(cp => cp._1 + "=" + cp._2).mkString(",")
 
   override def createDialogArea(parent: Composite): Control = {
+    setTitleImage(ScalastylePlugin.PluginLogo);
     val contents = composite(parent, Some(gridData()));
 
-    label(contents, "Name")
-    nameText = text(contents, model.configuration.name, true, false)
+    val headerComposite = composite(contents, layout = gridLayout(2), layoutData = Some(gridData()));
+    label(headerComposite, "Name")
+    nameText = text(headerComposite, model.configuration.name, true, false)
 
     val checkerGroup = group(contents, "Checkers")
 
@@ -131,7 +134,6 @@ class ScalastyleConfigurationDialog(parent: Shell, filename: String) extends Tit
   }
 
   private[this] def editChecker(modelChecker: Option[ModelChecker]): Unit = {
-    println("editChecker")
     if (modelChecker.isDefined) {
       val dialog = new ScalastyleCheckerDialog(getShell(), messageHelper, modelChecker.get)
       if (Window.OK == dialog.open()) {
@@ -151,11 +153,13 @@ class ScalastyleConfigurationDialog(parent: Shell, filename: String) extends Tit
       MessageDialog.open(MessageDialog.ERROR, getShell(), "Scalastyle configuration error", message, SWT.OK)
     } else {
         if (nameText.getText() != model.configuration.name || model.dirty) {
-    
-          println("writing")
-          Persistence.saveConfiguration(file.get.getAbsolutePath(), model.toConfiguration(nameText.getText()))
+          handleException(getShell()) {
+            Persistence.saveConfiguration(file.get.getAbsolutePath(), model.toConfiguration(nameText.getText()))
+            super.okPressed();
+          }
+        } else {
+          super.okPressed();
         }
-        super.okPressed();
     }
   }
 }

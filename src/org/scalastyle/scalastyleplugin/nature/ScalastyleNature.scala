@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.JavaCore;
 
+import org.scalastyle.scalastyleplugin.ExceptionUtils._
 import org.scalastyle.scalastyleplugin.ScalastylePlugin
 import org.scalastyle.scalastyleplugin.builder.ScalastyleBuilder
 import org.scalastyle.scalastyleplugin.builder.ScalastyleMarker
@@ -54,30 +55,34 @@ class ScalastyleNature extends IProjectNature {
   private[this] var project: IProject = _;
 
   def configure(): Unit = {
-    val description = project.getDescription();
-    val commands = description.getBuildSpec();
+    handleException {
+      val description = project.getDescription();
+      val commands = description.getBuildSpec();
 
-    if (!commands.exists(c => c.getBuilderName().equals(ScalastyleBuilder.BuilderId))) {
-      // add builder to project
-      val command = description.newCommand();
-      command.setBuilderName(ScalastyleBuilder.BuilderId);
+      if (!commands.exists(c => c.getBuilderName().equals(ScalastyleBuilder.BuilderId))) {
+        // add builder to project
+        val command = description.newCommand();
+        command.setBuilderName(ScalastyleBuilder.BuilderId);
 
-      description.setBuildSpec(commands :+ command);
-      project.setDescription(description, new NullProgressMonitor())
+        description.setBuildSpec(commands :+ command);
+        project.setDescription(description, new NullProgressMonitor())
+      }
     }
   }
 
   def deconfigure(): Unit = {
-    val description = project.getDescription();
-    val commands = description.getBuildSpec();
+    handleException {
+      val description = project.getDescription();
+      val commands = description.getBuildSpec();
 
-    val newCommands = commands.filter(c => !c.getBuilderName().equals(ScalastyleBuilder.BuilderId))
+      val newCommands = commands.filter(c => !c.getBuilderName().equals(ScalastyleBuilder.BuilderId))
 
-    description.setBuildSpec(newCommands);
-    project.setDescription(description, new NullProgressMonitor());
+      description.setBuildSpec(newCommands);
+      project.setDescription(description, new NullProgressMonitor());
 
-    // remove markers from the project
-    getProject().deleteMarkers(ScalastyleMarker.MarkerId, true, IResource.DEPTH_INFINITE);
+      // remove markers from the project
+      getProject().deleteMarkers(ScalastyleMarker.MarkerId, true, IResource.DEPTH_INFINITE);
+    }
   }
 
   def getProject: IProject = project

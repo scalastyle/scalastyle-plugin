@@ -48,12 +48,14 @@ import org.osgi.service.prefs.BackingStoreException
 import org.scalastyle.scalastyleplugin.ScalastylePlugin
 import org.scalastyle.scalastyleplugin.config._
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog
-import org.eclipse.ui.dialogs.ElementTreeSelectionDialog
+import org.eclipse.jface.dialogs.MessageDialog
 import org.eclipse.ui.dialogs.ISelectionStatusValidator
 import org.eclipse.ui.model.WorkbenchContentProvider
 import org.eclipse.ui.model.WorkbenchLabelProvider
 import org.eclipse.core.runtime.IStatus
 import org.eclipse.core.resources.IFile
+import org.eclipse.core.runtime.Path
+import org.eclipse.core.runtime.IPath
 import org.eclipse.core.runtime.Status
 import org.eclipse.ui.PlatformUI
 import org.eclipse.swt.widgets.Shell
@@ -61,8 +63,12 @@ import org.eclipse.ui.dialogs.ElementTreeSelectionDialog
 import org.eclipse.jface.window.Window
 import org.scalastyle.scalastyleplugin.StringUtils._
 import org.scalastyle.scalastyleplugin.SwtUtils._
+import org.scalastyle.scalastyleplugin.ExceptionUtils._
 import org.scalastyle._
 import org.eclipse.jface.viewers.TableViewer
+import org.eclipse.ui.dialogs.SaveAsDialog
+import org.eclipse.core.resources.ResourcesPlugin
+import org.eclipse.core.runtime.URIUtil
 
 case class Configuration(location: String) extends TableLine
 
@@ -79,11 +85,12 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
   var editButton: Button = _
   var currentSelection: Configuration = _
   var browseButton: Button = _
+  var removeButton: Button = _
+  var Button: Button = _
   var tableViewer: TableViewer = _
 
   private[this] val columns = List(
-    DialogColumn[Configuration]("Location", SWT.LEFT, LocationSorter, 100, { _.location })
-  )
+    DialogColumn[Configuration]("Location", SWT.LEFT, LocationSorter, 100, { _.location }))
 
   def createContents(parent: Composite): Control = {
     noDefaultAndApplyButton()
@@ -95,14 +102,18 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
     parent.setLayout(gridLayout())
     parent.setLayoutData(gridData())
     val parentComposite = composite(parent)
+    val spanColumns = 4
 
-    val configurationsGroup = group(parentComposite, "Configurations");
+    val configurationsGroup = group(parentComposite, "Configurations", layout = gridLayout(spanColumns));
 
-    tableViewer = table(configurationsGroup, model, columns, new ModelContentProvider(model), new PropertiesLabelProvider(columns), setSelection, refresh)
+    val tableGridData = new GridData(GridData.FILL_BOTH)
+    tableGridData.horizontalSpan = spanColumns;
+    tableGridData.horizontalAlignment = GridData.FILL;
 
-//    val generalComposite = createGeneralContents(parentComposite)
+    tableViewer = table(configurationsGroup, model, columns, new ModelContentProvider(model),
+        new PropertiesLabelProvider(columns), setSelection, refresh, layoutData = tableGridData)
 
-    val browseButton = button(configurationsGroup, "Browse", true, {
+    val browseButton = button(configurationsGroup, "Browse/Add", true, {
       browseForFile(this.getShell(), "Select a scalastyle configuration file") match {
         case Some(file) => addConfiguration(file)
         case None =>
@@ -110,27 +121,41 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
     })
 
     editButton = button(configurationsGroup, "Edit", false, {
-      editConfiguration(currentSelection);
+      editConfiguration(currentSelection)
     })
 
+    removeButton = button(configurationsGroup, "Remove", false, {
+      removeConfiguration(currentSelection)
+    })
 
     parentComposite
   }
 
   def addConfiguration(file: IFile) = {
-    println("add configuration" + file.getFullPath().toString())
     model.elements = model.elements ::: List(Configuration(file.getFullPath().toString()))
     refresh()
   }
 
+  def removeConfiguration(configuration: Configuration) = {
+    model.elements = model.elements.filter(_.location != configuration.location)
+    refresh()
+    editButton.setEnabled(false);
+    removeButton.setEnabled(false);
+  }
+
+  private[this] def editConfiguration(configuration: Configuration) = {
+    val dialog = new ScalastyleConfigurationDialog(getShell(), configuration.location);
+    dialog.setBlockOnOpen(true);
+    dialog.open();
+  }
+
   def setSelection(selection: Configuration): Unit = {
-    println("setSelection")
     currentSelection = selection
     editButton.setEnabled(true);
+    removeButton.setEnabled(true);
   }
 
   def refresh(): Unit = {
-    println("refresh")
     tableViewer.refresh(true, true)
   }
 
@@ -141,11 +166,11 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
     dialog.setBlockOnOpen(true)
     dialog.setAllowMultiple(false)
     // TODO add initial selection
-//    val initial = file match {
-//      case Some(name) => name
-//      case None => null
-//    }
-//    dialog.setInitialSelection(initial)
+    //    val initial = file match {
+    //      case Some(name) => name
+    //      case None => null
+    //    }
+    //    dialog.setInitialSelection(initial)
     dialog.setInput(ScalastylePlugin.getWorkspace().getRoot())
 
     dialog.setValidator(new ISelectionStatusValidator() {
@@ -164,28 +189,11 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
     }
   }
 
-  private[this] def editConfiguration(configuration: Configuration) = {
-    val dialog = new ScalastyleConfigurationDialog(getShell(), configuration.location);
-    dialog.setBlockOnOpen(true);
-    dialog.open();
-  }
-
   def init(workbench: IWorkbench): Unit = {}
 
   override def performOk(): Boolean = {
-    try {
-//      val configurationFile = filenameText.getText();
+    handleException(getShell()) {
       Persistence.saveWorkspace(toWorkspaceConfigurations(model))
-
-      true
-    } catch {
-      case e: Exception =>
-        {
-          // TODO log something here
-          println("caught exception")
-          e.printStackTrace(System.out)
-        }
-        false
     }
   }
 

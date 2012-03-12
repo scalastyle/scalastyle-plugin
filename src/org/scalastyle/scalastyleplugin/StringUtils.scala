@@ -15,6 +15,7 @@
 // limitations under the License.
 
 package org.scalastyle.scalastyleplugin
+import org.eclipse.core.runtime.CoreException
 
 object StringUtils {
   def toOption(s: String): Option[String] = if (isEmpty(s.trim())) None else Some(s.trim())

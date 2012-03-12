@@ -34,6 +34,7 @@ import org.eclipse.ui.texteditor.MarkerUtilities
 import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.HashMap
 import org.scalastyle.scalastyleplugin.ScalastylePlugin
+import org.scalastyle.scalastyleplugin.ExceptionUtils._
 import org.scalastyle.scalastyleplugin.ScalastylePluginException
 import org.scalastyle.scalastyleplugin.nature.ScalastyleNature
 import org.scalastyle.ScalastyleConfiguration
@@ -108,33 +109,28 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
 
   // TODO when we do an incremental build, all files in the project seem to be marked as changed
   private def handleBuildSelection(resources: Array[IResource], monitor: IProgressMonitor, project: IProject, kind: Int): Unit = {
+    handleException {
+      // on full build remove all markers
+      if (kind == IncrementalProjectBuilder.FULL_BUILD) {
+        project.deleteMarkers(ScalastyleMarker.MarkerId, false, IResource.DEPTH_INFINITE);
+      }
 
-    // on full build remove all markers
-    if (kind == IncrementalProjectBuilder.FULL_BUILD) {
-      project.deleteMarkers(ScalastyleMarker.MarkerId, false, IResource.DEPTH_INFINITE);
-    }
-
-    try {
       val projectConfiguration = Persistence.loadProject(project)
       if (projectConfiguration.enabled && projectConfiguration.file.isDefined) {
 
         val file = Persistence.findConfiguration(projectConfiguration.file.get)
         if (file.isDefined && !file.get.exists) {
-          // TODO message
-          println("can't find " + file.get.getAbsolutePath())
+          throw ScalastylePluginException("cannot find file " + file.get.getAbsolutePath())
         } else {
-            val configuration = ScalastyleConfiguration.readFromXml(file.get.getAbsolutePath())
+          val configuration = ScalastyleConfiguration.readFromXml(file.get.getAbsolutePath())
 
-            val messages = new ScalastyleChecker[EclipseFileSpec]().checkFiles(configuration, resources.map(r => {
-              new EclipseFileSpec(r.getLocation().toFile().getAbsolutePath(), r)
-            }).toList)
+          val messages = new ScalastyleChecker[EclipseFileSpec]().checkFiles(configuration, resources.map(r => {
+            new EclipseFileSpec(r.getLocation().toFile().getAbsolutePath(), r)
+          }).toList)
 
-            new EclipseOutput().output(messages);
+          new EclipseOutput().output(messages);
         }
       }
-    } catch {
-      // TODO probably add something to the error log and marker?
-      case e: Exception => throw new CoreException(new Status(IStatus.ERROR, ScalastylePlugin.PluginId, IStatus.ERROR, e.getLocalizedMessage(), e))
     }
   }
 
@@ -190,28 +186,23 @@ class EclipseOutput extends Output[EclipseFileSpec] {
 
     // TODO rule metadata
 
-    try {
-      val severity = error.level match {
-        case WarningLevel => IMarker.SEVERITY_WARNING
-        case ErrorLevel => IMarker.SEVERITY_ERROR
-        case _ => IMarker.SEVERITY_WARNING
-      }
-
-      val markerAttributes: java.util.Map[String, Any] = HashMap(ScalastyleMarker.ModuleName -> "module",
-        ScalastyleMarker.MessageKey -> error.key,
-        IMarker.PRIORITY -> IMarker.PRIORITY_NORMAL,
-        IMarker.SEVERITY -> severity,
-        "categoryId" -> 998)
-
-      MarkerUtilities.setLineNumber(markerAttributes, error.lineNumber.getOrElse(1));
-      MarkerUtilities.setMessage(markerAttributes, messageHelper.message(error.clazz.getClassLoader(), error.key, error.args));
-
-      // create a marker for the file
-      MarkerUtilities.createMarker(error.fileSpec.resource, markerAttributes, ScalastyleMarker.MarkerId)
-    } catch {
-      case _ =>
-      // TODO log exception
+    val severity = error.level match {
+      case WarningLevel => IMarker.SEVERITY_WARNING
+      case ErrorLevel => IMarker.SEVERITY_ERROR
+      case _ => IMarker.SEVERITY_WARNING
     }
+
+    val markerAttributes: java.util.Map[String, Any] = HashMap(ScalastyleMarker.ModuleName -> "module",
+      ScalastyleMarker.MessageKey -> error.key,
+      IMarker.PRIORITY -> IMarker.PRIORITY_NORMAL,
+      IMarker.SEVERITY -> severity,
+      "categoryId" -> 998)
+
+    MarkerUtilities.setLineNumber(markerAttributes, error.lineNumber.getOrElse(1));
+    MarkerUtilities.setMessage(markerAttributes, messageHelper.message(error.clazz.getClassLoader(), error.key, error.args));
+
+    // create a marker for the file
+    MarkerUtilities.createMarker(error.fileSpec.resource, markerAttributes, ScalastyleMarker.MarkerId)
   }
 
 }

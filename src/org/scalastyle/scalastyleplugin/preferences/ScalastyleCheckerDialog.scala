@@ -25,6 +25,7 @@ import org.eclipse.jface.dialogs._;
 import org.scalastyle._;
 import org.scalastyle.scalastyleplugin.SwtUtils._;
 import org.scalastyle.scalastyleplugin.StringUtils._;
+import org.scalastyle.scalastyleplugin.ScalastylePlugin
 
 class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, modelChecker: ModelChecker) extends TitleAreaDialog(parent) {
   setShellStyle(getShellStyle() | SWT.RESIZE);
@@ -34,13 +35,13 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
   var parameterControls = Map[String, Text]()
 
   override def createDialogArea(parent: Composite): Control = {
+    setTitleImage(ScalastylePlugin.PluginLogo);
     val dialogArea = super.createDialogArea(parent).asInstanceOf[Composite];
 
     val contents = composite(dialogArea, Some(gridData(GridData.FILL_BOTH)), layout = gridLayout(1));
 
     val allContents = composite(contents, layout = gridLayout(2));
 
-    // TODO make it look nice
     // TODO all text to scalastyle_messages.properties
 
     val id = modelChecker.definitionChecker.id

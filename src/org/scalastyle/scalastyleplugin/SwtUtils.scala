@@ -173,9 +173,10 @@ object SwtUtils {
   case class DialogColumn[T](name: String, alignment: Int, sorter: TableSorter[T, String], weight: Int, getText: (T) => String)
 
   def table[T](parent: Composite, model: Any, columns: List[DialogColumn[T]], contentProvider: IStructuredContentProvider,
-                  labelProvider: ITableLabelProvider, setSelection: (T) => Unit, refresh: => Unit): TableViewer = {
+                  labelProvider: ITableLabelProvider, setSelection: (T) => Unit, refresh: => Unit,
+                  layoutData: Any = new GridData(GridData.FILL_BOTH)): TableViewer = {
     val table = new Table(parent, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION)
-    table.setLayoutData(new GridData(GridData.FILL_BOTH))
+    table.setLayoutData(layoutData)
     table.setHeaderVisible(true)
     table.setLinesVisible(true)
 

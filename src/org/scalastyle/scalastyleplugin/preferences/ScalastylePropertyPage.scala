@@ -58,6 +58,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PropertyPage;
 import org.scalastyle.scalastyleplugin.SwtUtils._
+import org.scalastyle.scalastyleplugin.ExceptionUtils._
 import org.scalastyle.scalastyleplugin.config._
 
 case class PropertyModel(enabled: Boolean, configuration: Option[String])
@@ -118,10 +119,9 @@ class ScalastylePropertyPage extends PropertyPage {
   }
 
   override def performOk(): Boolean = {
-    val configuration = toProjectConfiguration(model)
-
-    Persistence.saveProject(project, configuration)
-
-    true
+    handleException(getShell()) {
+      val configuration = toProjectConfiguration(model)
+      Persistence.saveProject(project, configuration)
+    }
   }
 }
