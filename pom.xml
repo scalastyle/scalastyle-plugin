@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+  xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.scalastyle</groupId>
   <artifactId>org.scalastyle.scalastyleplugin</artifactId>
@@ -19,18 +20,18 @@
 
   <dependencies>
     <dependency>
-    	<groupId>com.miglayout</groupId>
-    	<artifactId>miglayout</artifactId>
-    	<version>${miglayout.version}</version>
-    	<type>jar</type>
-    	<scope>compile</scope>
+      <groupId>com.miglayout</groupId>
+      <artifactId>miglayout</artifactId>
+      <version>${miglayout.version}</version>
+      <type>jar</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
-	  <groupId>log4j</groupId>
-	  <artifactId>log4j</artifactId>
-	  <version>${log4j.version}</version>
-	  <scope>compile</scope>
-	  <exclusions>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>${log4j.version}</version>
+      <scope>compile</scope>
+      <exclusions>
         <exclusion>
           <groupId>javax.mail</groupId>
           <artifactId>mail</artifactId>
@@ -71,9 +72,11 @@
       <name>Eclipse Helios p2 repository</name>
       <layout>p2</layout>
       <url>http://download.eclipse.org/releases/helios/</url>
-      <snapshots><enabled>false</enabled></snapshots>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
-</repositories>
+  </repositories>
   <build>
     <plugins>
       <plugin>
@@ -94,14 +97,14 @@
         <configuration>
           <resolver>p2</resolver>
           <pomDependencies>consider</pomDependencies>
-              <target>
-                <artifact>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>${project.artifactId}</artifactId>
-                  <version>${project.version}</version>
-                  <classifier>target</classifier>
-                </artifact>
-              </target>
+          <target>
+            <artifact>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>${project.artifactId}</artifactId>
+              <version>${project.version}</version>
+              <classifier>target</classifier>
+            </artifact>
+          </target>
         </configuration>
       </plugin>
       <plugin>
@@ -157,7 +160,7 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <version>2.4</version>
         <executions>
-        <execution>
+          <execution>
             <id>copy</id>
             <phase>initialize</phase>
             <goals>
@@ -215,7 +218,7 @@
           <execution>
             <id>attach-sources</id>
             <goals>
-              <goal>jar</goal>
+              <goal>jar-no-fork</goal>
             </goals>
           </execution>
         </executions>
