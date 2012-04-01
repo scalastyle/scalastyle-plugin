@@ -16,6 +16,9 @@
     <scala.version>2.9.1</scala.version>
     <scalastyle.version>0.1.0-SNAPSHOT</scalastyle.version>
     <scalariform.version>0.1.1</scalariform.version>
+	<plugin.version>${project.version}</plugin.version>
+	<plugin.id>${project.groupId}</plugin.id>
+	<feature.id>${plugin.id}.feature</feature.id>
   </properties>
 
   <dependencies>
