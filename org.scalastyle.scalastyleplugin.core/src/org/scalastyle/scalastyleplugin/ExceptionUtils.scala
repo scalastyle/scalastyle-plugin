@@ -28,6 +28,7 @@ object ExceptionUtils {
 
   def log(message: String, t: Throwable): Unit = {
     val status = new Status(IStatus.ERROR, ScalastylePlugin.PluginId, IStatus.OK, message, t);
+    t.printStackTrace(System.err)
     eclipseLog().log(status);
   }
 

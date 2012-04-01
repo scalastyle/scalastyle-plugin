@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>scalastyle-plugin</name>
+	<name>org.scalastyle.scalastyleplugin.core</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -21,7 +21,7 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>org.scalastyle.scalastyleplugin.ScalastyleBuilder</name>
+			<name>org.scalastyle.scalastyleplugin.core.ScalastyleBuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
@@ -30,6 +30,6 @@
 		<nature>org.scala-ide.sdt.core.scalanature</nature>
 		<nature>org.eclipse.pde.PluginNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
-		<nature>org.scalastyle.scalastyleplugin.ScalastyleNature</nature>
+		<nature>org.scalastyle.scalastyleplugin.core.ScalastyleNature</nature>
 	</natures>
 </projectDescription>

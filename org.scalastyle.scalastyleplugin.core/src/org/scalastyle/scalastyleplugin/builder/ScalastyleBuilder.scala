@@ -109,6 +109,7 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
 
   // TODO when we do an incremental build, all files in the project seem to be marked as changed
   private def handleBuildSelection(resources: Array[IResource], monitor: IProgressMonitor, project: IProject, kind: Int): Unit = {
+    println("hello world")
     handleException {
       // on full build remove all markers
       if (kind == IncrementalProjectBuilder.FULL_BUILD) {

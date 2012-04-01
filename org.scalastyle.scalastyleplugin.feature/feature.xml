@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="${feature.id}"
-      label="Scalastyle"
-      version="${plugin.version}"
-      provider-name="Scalastyle Organization">
+      id="org.scalastyle.scalastyleplugin.feature"
+      label="Scalastyle Plugin"
+      version="0.1.0">
+
 
    <description url="https://github.com/scalastyle">
-      Scalastyle is a style checker for Scala. It checks your Scala codes against a number of configurable rules, and marks the code which violates these rules with warning or error markers in your source code.
+      Scalastyle is a style checker for Scala. It checks your Scala code against a number of configurable rules, and marks the code which violates these rules with warning or error markers in your source code.
    </description>
 
    <copyright>
@@ -210,9 +210,10 @@ and limitations under the License.
    </requires>
 
    <plugin
-         id="${plugin.id}"
+         id="org.scalastyle.scalastyleplugin.core"
          download-size="0"
          install-size="0"
-         version="${plugin.version}"/>
+         version="0.0.0"
+         unpack="false"/>
 
 </feature>

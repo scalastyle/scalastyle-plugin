@@ -3,10 +3,13 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
   xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.scalastyle</groupId>
-  <artifactId>org.scalastyle.scalastyleplugin</artifactId>
-  <version>0.1.0</version>
-  <packaging>pom</packaging>
+  <parent>
+    <groupId>org.scalastyle</groupId>
+    <artifactId>org.scalastyle.scalastyleplugin</artifactId>
+    <version>0.1.0</version>
+  </parent>
+  <artifactId>org.scalastyle.scalastyleplugin.core</artifactId>
+  <packaging>eclipse-plugin</packaging>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,22 +19,8 @@
     <scala.version>2.9.1</scala.version>
     <scalastyle.version>0.1.0-SNAPSHOT</scalastyle.version>
     <scalariform.version>0.1.1</scalariform.version>
-	<plugin.version>${project.version}</plugin.version>
-	<plugin.id>${project.groupId}.${project.artifactId}</plugin.id>
-	<feature.id>${plugin.id}.feature</feature.id>
-	<core.id>${plugin.id}.core</core.id>
   </properties>
 
-  <prerequisites>
-    <maven>3.0</maven>
-  </prerequisites>
-
-  <modules>
-    <module>org.scalastyle.scalastyleplugin.core</module>
-    <module>org.scalastyle.scalastyleplugin.feature</module>
-    <module>org.scalastyle.scalastyleplugin.update-site</module>
-  </modules>
-  
   <dependencies>
     <dependency>
       <groupId>com.miglayout</groupId>
@@ -111,6 +100,14 @@
         <configuration>
           <resolver>p2</resolver>
           <pomDependencies>consider</pomDependencies>
+          <target>
+            <artifact>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>${project.artifactId}</artifactId>
+              <version>${project.version}</version>
+              <classifier>target</classifier>
+            </artifact>
+          </target>
         </configuration>
       </plugin>
       <plugin>

@@ -23,7 +23,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.IWorkspace;
 
 object ScalastylePlugin {
-  val PluginId = "org.scalastyle.scalastyleplugin"
+  val PluginId = "org.scalastyle.scalastyleplugin.core"
 
   private var plugin: ScalastylePlugin = _
 
