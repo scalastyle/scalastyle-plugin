@@ -119,7 +119,7 @@ class ScalastylePropertyPage extends PropertyPage {
   }
 
   override def performOk(): Boolean = {
-    handleException(getShell()) {
+    handleError(getShell()) {
       val configuration = toProjectConfiguration(model)
       Persistence.saveProject(project, configuration)
     }

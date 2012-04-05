@@ -153,7 +153,7 @@ class ScalastyleConfigurationDialog(parent: Shell, filename: String) extends Tit
       MessageDialog.open(MessageDialog.ERROR, getShell(), "Scalastyle configuration error", message, SWT.OK)
     } else {
         if (nameText.getText() != model.configuration.name || model.dirty) {
-          handleException(getShell()) {
+          handleError(getShell()) {
             Persistence.saveConfiguration(file.get.getAbsolutePath(), model.toConfiguration(nameText.getText()))
             super.okPressed();
           }

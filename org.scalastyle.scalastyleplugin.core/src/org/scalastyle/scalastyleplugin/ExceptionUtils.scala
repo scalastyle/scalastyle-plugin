@@ -39,7 +39,7 @@ object ExceptionUtils {
     log(message, t);
   }
 
-  def handleException(shell: Shell)(fn: => Unit): Boolean = {
+  def handleError(shell: Shell)(fn: => Unit): Boolean = {
     try {
       fn
       true

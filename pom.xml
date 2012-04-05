@@ -82,7 +82,7 @@
   </dependencies>
   <repositories>
     <repository>
-      <id>Indigo</id>
+      <id>Helios</id>
       <name>Eclipse Helios p2 repository</name>
       <layout>p2</layout>
       <url>http://download.eclipse.org/releases/helios/</url>

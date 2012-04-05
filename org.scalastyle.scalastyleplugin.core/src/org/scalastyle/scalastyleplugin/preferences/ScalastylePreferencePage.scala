@@ -192,7 +192,7 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
   def init(workbench: IWorkbench): Unit = {}
 
   override def performOk(): Boolean = {
-    handleException(getShell()) {
+    handleError(getShell()) {
       Persistence.saveWorkspace(toWorkspaceConfigurations(model))
     }
   }

@@ -109,7 +109,6 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
 
   // TODO when we do an incremental build, all files in the project seem to be marked as changed
   private def handleBuildSelection(resources: Array[IResource], monitor: IProgressMonitor, project: IProject, kind: Int): Unit = {
-    println("hello world")
     handleException {
       // on full build remove all markers
       if (kind == IncrementalProjectBuilder.FULL_BUILD) {
@@ -162,9 +161,8 @@ trait IFilter {
 
 class EclipseOutput extends Output[EclipseFileSpec] {
   private[this] val messageHelper = new MessageHelper(this.getClass().getClassLoader())
-  override def output(messages: List[Message[EclipseFileSpec]]) = messages.foreach(message)
 
-  private def message(m: Message[EclipseFileSpec]) = m match {
+  override def message(m: Message[EclipseFileSpec]) = m match {
     case StartWork() => {}
     case EndWork() => {}
     case StartFile(file) => {
