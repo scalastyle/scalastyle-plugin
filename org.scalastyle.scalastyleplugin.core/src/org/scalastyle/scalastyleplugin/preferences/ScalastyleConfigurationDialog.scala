@@ -50,6 +50,10 @@ case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChec
     definitionChecker.parameters.get(name).get.typeName
   }
 
+  def isMultiple(name: String): Boolean = {
+    definitionChecker.parameters.get(name).get.multiple
+  }
+
   // TODO put some tests in here to ensure values are copied correctly etc.
   def configurationChecker(): ConfigurationChecker = configurationChecker
 

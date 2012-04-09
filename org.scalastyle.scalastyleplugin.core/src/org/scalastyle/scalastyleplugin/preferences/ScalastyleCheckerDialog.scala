@@ -70,7 +70,7 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
       parameterControls = modelChecker.configurationChecker.parameters.map({
         case (name, value) => {
           label(parameterGroup, messageHelper.label(id + "." + name))
-          (name, text(parameterGroup, value, true, modelChecker.typeOf(name) == "multistring", messageHelper.description(id + "." + name)))
+          (name, text(parameterGroup, value, true, modelChecker.isMultiple(name), messageHelper.description(id + "." + name)))
         }
       })
     }
