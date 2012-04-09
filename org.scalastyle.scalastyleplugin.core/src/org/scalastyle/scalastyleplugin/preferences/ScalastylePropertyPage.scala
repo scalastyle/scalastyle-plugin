@@ -97,7 +97,6 @@ class ScalastylePropertyPage extends PropertyPage {
 
   private[this] def toProjectConfiguration(model: PropertyModel) = {
     val index = configurationCombo.getSelectionIndex()
-    println("index=" + index)
     val selected = if (index >= 0) {
       Some(configurationCombo.getItems()(index))
     } else {

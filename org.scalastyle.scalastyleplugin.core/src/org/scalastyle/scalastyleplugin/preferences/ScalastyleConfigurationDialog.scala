@@ -41,8 +41,8 @@ case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChec
   private[this] var configurationChecker = copyConfigurationChecker()
   var dirty = false
 
-  def set(level: Level, enabled: Boolean, parameters: Map[String, String]) = {
-    configurationChecker = configurationChecker.copy(level = level, enabled = enabled, parameters = parameters)
+  def set(level: Level, enabled: Boolean, parameters: Map[String, String], customMessage: Option[String]) = {
+    configurationChecker = configurationChecker.copy(level = level, enabled = enabled, parameters = parameters, customMessage = customMessage)
     dirty = true
   }
 
@@ -65,7 +65,7 @@ case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChec
   }
 
   def definitionToConfiguration(checker: DefinitionChecker): ConfigurationChecker = {
-    ConfigurationChecker(checker.className, checker.level, false, checker.parameters.map(m => (m._1, m._2.defaultValue)).toMap)
+    ConfigurationChecker(checker.className, checker.level, false, checker.parameters.map(m => (m._1, m._2.defaultValue)).toMap, None)
   }
 }
 
@@ -78,7 +78,7 @@ case class Model(definition: ScalastyleDefinition, configuration: ScalastyleConf
 
   def toConfiguration(name: String): ScalastyleConfiguration = {
     val checkers = list.map(mc => ConfigurationChecker(mc.configurationChecker.className, mc.configurationChecker.level,
-                                mc.configurationChecker.enabled, mc.configurationChecker.parameters))
+                                mc.configurationChecker.enabled, mc.configurationChecker.parameters, mc.configurationChecker.customMessage))
     ScalastyleConfiguration(name, checkers)
   }
 }

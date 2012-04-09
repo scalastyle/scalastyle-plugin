@@ -128,7 +128,7 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
             new EclipseFileSpec(r.getLocation().toFile().getAbsolutePath(), r)
           }).toList)
 
-          new EclipseOutput().output(messages);
+          new EclipseOutput().output(messages)
         }
       }
     }
@@ -195,8 +195,8 @@ class EclipseOutput extends Output[EclipseFileSpec] {
       IMarker.SEVERITY -> severity,
       "categoryId" -> 999)
 
-    MarkerUtilities.setLineNumber(markerAttributes, error.lineNumber.getOrElse(1));
-    MarkerUtilities.setMessage(markerAttributes, messageHelper.message(error.clazz.getClassLoader(), error.key, error.args));
+    MarkerUtilities.setLineNumber(markerAttributes, error.lineNumber.getOrElse(1))
+    MarkerUtilities.setMessage(markerAttributes, findMessage(error.clazz, error.key, error.args, error.customMessage))
 
     // create a marker for the file
     MarkerUtilities.createMarker(error.fileSpec.resource, markerAttributes, ScalastyleMarker.MarkerId)

@@ -33,6 +33,7 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
   var enabledCheckbox: Button = _
   var severityCombo: Combo = _
   var parameterControls = Map[String, Text]()
+  var customMessageText: Text = _
 
   override def createDialogArea(parent: Composite): Control = {
     setTitleImage(ScalastylePlugin.PluginLogo);
@@ -60,6 +61,9 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
     label(allContents, "Severity")
     severityCombo = combo(allContents, Array("warning", "error"), modelChecker.configurationChecker.level.name)
 
+    label(allContents, "Custom Message")
+    customMessageText = text(allContents, fromOption(modelChecker.configurationChecker.customMessage), true, false)
+
     if (modelChecker.configurationChecker.parameters.size > 0) {
       val parameterGroup = group(contents, "Parameters", layout = gridLayout(2), layoutData = Some(gridData(GridData.FILL_HORIZONTAL)))
 
@@ -73,6 +77,9 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
 
     contents
   }
+
+  private[this] def fromOption(s: Option[String]) = if (s.isDefined) s.get else ""
+  private[this] def toOption(t: Text) = if (t.getText().size == 0) None else Some(t.getText())
 
   def isNumeric(s: String): Boolean = s.forall(_.isDigit)
 
@@ -101,7 +108,7 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
     } else {
       val parameters = parameterControls.map({ case (name, text) => (name, text.getText()) }).toMap
 
-      modelChecker.set(level, enabled, parameters)
+      modelChecker.set(level, enabled, parameters, toOption(customMessageText))
 
       super.okPressed()
     }
