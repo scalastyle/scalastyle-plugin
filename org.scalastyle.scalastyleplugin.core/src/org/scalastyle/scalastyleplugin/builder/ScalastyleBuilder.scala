@@ -160,9 +160,9 @@ trait IFilter {
 }
 
 class EclipseOutput extends Output[EclipseFileSpec] {
-  private[this] val messageHelper = new MessageHelper(this.getClass().getClassLoader())
+  private val messageHelper = new MessageHelper(this.getClass().getClassLoader())
 
-  override def message(m: Message[EclipseFileSpec]) = m match {
+  override def message(m: Message[EclipseFileSpec]): Unit = m match {
     case StartWork() => {}
     case EndWork() => {}
     case StartFile(file) => {
@@ -196,7 +196,7 @@ class EclipseOutput extends Output[EclipseFileSpec] {
       "categoryId" -> 999)
 
     MarkerUtilities.setLineNumber(markerAttributes, error.lineNumber.getOrElse(1))
-    MarkerUtilities.setMessage(markerAttributes, findMessage(error.clazz, error.key, error.args, error.customMessage))
+    MarkerUtilities.setMessage(markerAttributes, findMessage(messageHelper, error.clazz, error.key, error.args, error.customMessage))
 
     // create a marker for the file
     MarkerUtilities.createMarker(error.fileSpec.resource, markerAttributes, ScalastyleMarker.MarkerId)
