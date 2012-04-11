@@ -17,6 +17,7 @@ install()
 	$eclipse_dir/eclipse $eclipse_opt -application $app -repository "$update_site" -installIU "$feature.feature.group"
 	ls -ld $eclipse_dir/features/org.scalastyle.scalastyleplugin.feature*
 	ls -l $eclipse_dir/features/org.scalastyle.scalastyleplugin.feature*
+	ls -l $eclipse_dir/plugins/org.scalastyle.scalastyleplugin*
 	echo done
 }
 
@@ -25,6 +26,8 @@ uninstall()
 	echo uninstalling
 	$eclipse_dir/eclipse $eclipse_opt -application $app -repository $eclipse_repo -uninstallIU "$feature.feature.group"
 	ls -l $eclipse_dir/features/org.scalastyle.scalastyleplugin.feature*/feature.xml
+	$eclipse_dir/eclipse $eclipse_opt -application org.eclipse.equinox.p2.garbagecollector.application -profile epp.package.jee
+	ls -l $eclipse_dir/plugins/org.scalastyle.scalastyleplugin*
 	echo done
 }
 
