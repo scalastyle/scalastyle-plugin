@@ -23,47 +23,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.miglayout</groupId>
-      <artifactId>miglayout</artifactId>
-      <version>${miglayout.version}</version>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>${log4j.version}</version>
-      <scope>compile</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.mail</groupId>
-          <artifactId>mail</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.jms</groupId>
-          <artifactId>jms</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.sun.jdmk</groupId>
-          <artifactId>jmxtools</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.sun.jmx</groupId>
-          <artifactId>jmxri</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.scalariform</groupId>
-      <artifactId>scalariform_${scala.version}</artifactId>
-      <version>${scalariform.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
-      <version>${scala.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.scalastyle</groupId>
       <artifactId>scalastyle_${scala.version}</artifactId>
       <version>${scalastyle.version}</version>
@@ -172,25 +131,6 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>log4j</groupId>
-                  <artifactId>log4j</artifactId>
-                  <version>${log4j.version}</version>
-                  <outputDirectory>${basedir}/lib</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>log4j</groupId>
-                  <artifactId>log4j</artifactId>
-                  <version>${log4j.version}</version>
-                  <outputDirectory>${basedir}/lib</outputDirectory>
-                  <classifier>sources</classifier>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>com.miglayout</groupId>
-                  <artifactId>miglayout</artifactId>
-                  <version>${miglayout.version}</version>
-                  <outputDirectory>${basedir}/lib</outputDirectory>
-                </artifactItem>
-                <artifactItem>
                   <groupId>org.scala-lang</groupId>
                   <artifactId>scala-library</artifactId>
                   <version>${scala.version}</version>
@@ -201,6 +141,8 @@
                   <artifactId>scalastyle_${scala.version}</artifactId>
                   <version>${scalastyle.version}</version>
                   <outputDirectory>${basedir}/lib</outputDirectory>
+                  <destFileName>scalastyle_${scala.version}-${scalastyle.version}.jar</destFileName>
+                  <overWrite>true</overWrite>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.scalariform</groupId>

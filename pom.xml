@@ -31,55 +31,7 @@
     <module>org.scalastyle.scalastyleplugin.feature</module>
     <module>org.scalastyle.scalastyleplugin.update-site</module>
   </modules>
-  
-  <dependencies>
-    <dependency>
-      <groupId>com.miglayout</groupId>
-      <artifactId>miglayout</artifactId>
-      <version>${miglayout.version}</version>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>${log4j.version}</version>
-      <scope>compile</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.mail</groupId>
-          <artifactId>mail</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.jms</groupId>
-          <artifactId>jms</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.sun.jdmk</groupId>
-          <artifactId>jmxtools</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.sun.jmx</groupId>
-          <artifactId>jmxri</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.scalariform</groupId>
-      <artifactId>scalariform_${scala.version}</artifactId>
-      <version>${scalariform.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
-      <version>${scala.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.scalastyle</groupId>
-      <artifactId>scalastyle_${scala.version}</artifactId>
-      <version>${scalastyle.version}</version>
-    </dependency>
-  </dependencies>
+
   <repositories>
     <repository>
       <id>Helios</id>
@@ -161,61 +113,7 @@
           </filesets>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.4</version>
-        <executions>
-          <execution>
-            <id>copy</id>
-            <phase>initialize</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>log4j</groupId>
-                  <artifactId>log4j</artifactId>
-                  <version>${log4j.version}</version>
-                  <outputDirectory>${basedir}/lib</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>log4j</groupId>
-                  <artifactId>log4j</artifactId>
-                  <version>${log4j.version}</version>
-                  <outputDirectory>${basedir}/lib</outputDirectory>
-                  <classifier>sources</classifier>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>com.miglayout</groupId>
-                  <artifactId>miglayout</artifactId>
-                  <version>${miglayout.version}</version>
-                  <outputDirectory>${basedir}/lib</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.scala-lang</groupId>
-                  <artifactId>scala-library</artifactId>
-                  <version>${scala.version}</version>
-                  <outputDirectory>${basedir}/lib</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.scalastyle</groupId>
-                  <artifactId>scalastyle_${scala.version}</artifactId>
-                  <version>${scalastyle.version}</version>
-                  <outputDirectory>${basedir}/lib</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.scalariform</groupId>
-                  <artifactId>scalariform_${scala.version}</artifactId>
-                  <version>${scalariform.version}</version>
-                  <outputDirectory>${basedir}/lib</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
