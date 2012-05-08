@@ -82,6 +82,7 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
   private[this] def toOption(t: Text) = if (t.getText().size == 0) None else Some(t.getText())
 
   def isNumeric(s: String): Boolean = s.forall(_.isDigit)
+  def isBoolean(s: String): Boolean = s.equals("true") || s.equals("false")
 
   override def okPressed(): Unit = {
     val enabled = enabledCheckbox.getSelection()
@@ -94,6 +95,7 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
           Some((name, "must have a value"))
         } else {
           modelChecker.typeOf(name) match {
+            case BooleanType => if (!isBoolean(contents)) Some((name, "must be a boolean (true/false)")) else None
             case IntegerType => if (!isNumeric(contents)) Some((name, "must be an integer")) else None
             case StringType => None
           }
