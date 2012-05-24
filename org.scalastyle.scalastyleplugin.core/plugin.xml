@@ -3,6 +3,14 @@
 <plugin>
 
    <extension
+         point="org.eclipse.help.toc">
+      <toc
+            file="toc.xml"
+            primary="true">
+      </toc>
+   </extension>
+
+   <extension
          id="ScalastyleBuilder"
          name="%ScalastyleBuilder.name"
          point="org.eclipse.core.resources.builders">

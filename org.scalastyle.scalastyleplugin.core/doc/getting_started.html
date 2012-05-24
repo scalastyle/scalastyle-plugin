@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "xhtml11-flat.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8"/>
+        <meta name="section" content="docs-basic"/>
+        <link type="text/css" href="style.css" rel="stylesheet"/>
+        <title>Getting Started</title>
+    </head>
+    <body>
+        <h2>-- Getting Started --</h2>
+        <p>To start using Scalastyle with your project, you need to add Scalastyle Nature to your project, set up a configuration for Scalastyle,
+		then enabled Scalastyle for that project.</p>
+        <p><b>Add Scalastyle Nature to your project<br/>
+            </b>The Scalastyle plugin uses a project builder to check your Scala files against your configuration.
+			Each time you modify a scala file, the file will be checked against your configuration when the file is saved.
+			To add this builder to your project, go to the project in the Project Explorer and select <b>Scalastyle->Add Scalastyle Nature</b>
+			</p>
+        <p><b>Add a configuration file to your project<br/>
+            </b>Scalastyle requires a configuration file which tells it which rules to apply to your code. The easiest way to begin is to copy the file:
+			
+			<a href="https://github.com/scalastyle/scalastyle/blob/master/lib/scalastyle_config.xml">https://github.com/scalastyle/scalastyle/blob/master/lib/scalastyle_config.xml</a>
+			
+			This is the configuration we use with Scalastyle, so it's the best as well :-) Store this file somewhere in your project tree, where it will be accessible from Eclipse.
+			</p>
+        <p><b>Add the configuration file to the list of available configuration files<br/>
+            </b>In the Workspace Preferences, select the Scalastyle configuration page. You can then add the file you've just copied into your project into that list.
+			</p>
+        <p><b>Select the configuration for your project.</b>
+		Finally, back in the project preferences, go and select the configuration in the drop down list, and ensure that the Enabled checkbox is ticked.
+		<br/>Do a project clean and build, and you should see Scalastyle errors appear in your problems view.
+			</p>
+        <p><b>Modify the configuration.</b>
+		In the workspace preferences, you can modify the rules to check by selecting the configuration and clicking on Edit.</p>
+    </body>
+</html>
