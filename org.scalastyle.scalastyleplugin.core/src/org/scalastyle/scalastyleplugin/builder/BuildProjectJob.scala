@@ -28,8 +28,9 @@ import org.scalastyle.scalastyleplugin.Messages
 import org.scalastyle.scalastyleplugin.nature.ScalastyleNature
 
 object BuildProjectJob {
-  def apply(project: IProject, kind: Int) = new BuildProjectJob(Array[IProject](project), kind, NLS.bind(Messages.buildSingleProject, project.getName()))
-  def apply(projects: Array[IProject], kind: Int) = new BuildProjectJob(projects, kind, Messages.buildAllProjects)
+  def apply(project: IProject, kind: Int): BuildProjectJob = new BuildProjectJob(Array[IProject](project),
+                                                              kind, NLS.bind(Messages.buildSingleProject, project.getName()))
+  def apply(projects: Array[IProject], kind: Int): BuildProjectJob = new BuildProjectJob(projects, kind, Messages.buildAllProjects)
 }
 
 class BuildProjectJob(projects: Array[IProject], kind: Int, message: String) extends Job(message) {

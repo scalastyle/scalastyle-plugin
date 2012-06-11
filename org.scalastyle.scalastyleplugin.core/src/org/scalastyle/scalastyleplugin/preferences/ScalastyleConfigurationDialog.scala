@@ -36,12 +36,14 @@ import org.scalastyle.scalastyleplugin.StringUtils._
 import org.scalastyle.scalastyleplugin.ExceptionUtils._
 import org.scalastyle.scalastyleplugin.config.Persistence
 
+// scalastyle:off magic.number
+
 case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChecker: Option[ConfigurationChecker]) extends TableLine {
-  def enabled = _configurationChecker.isDefined && _configurationChecker.get.enabled
+  def enabled: Boolean = _configurationChecker.isDefined && _configurationChecker.get.enabled
   private[this] var configurationChecker = copyConfigurationChecker()
   var dirty = false
 
-  def set(level: Level, enabled: Boolean, parameters: Map[String, String], customMessage: Option[String]) = {
+  def set(level: Level, enabled: Boolean, parameters: Map[String, String], customMessage: Option[String]) {
     configurationChecker = configurationChecker.copy(level = level, enabled = enabled, parameters = parameters, customMessage = customMessage)
     dirty = true
   }
@@ -76,9 +78,9 @@ case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChec
 case class Model(definition: ScalastyleDefinition, configuration: ScalastyleConfiguration) extends Container[ModelChecker] {
   val list: List[ModelChecker] = definition.checkers.map(dc => ModelChecker(dc, configuration.checks.find(c => c.className == dc.className)))
 
-  def elements = list
+  def elements: List[ModelChecker] = list
 
-  def dirty = list.find(_.dirty).isDefined
+  def dirty: Boolean = list.find(_.dirty).isDefined
 
   def toConfiguration(name: String): ScalastyleConfiguration = {
     val checkers = list.map(mc => ConfigurationChecker(mc.configurationChecker.className, mc.configurationChecker.level,

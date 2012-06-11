@@ -44,21 +44,21 @@ abstract class ScalastyleNatureAction extends IObjectActionDelegate {
   private var selectedProjects: Array[IProject] = _
   protected def job(projects: Array[IProject]): WorkspaceJob
 
-  def setActivePart(action: IAction, targetPart: IWorkbenchPart) = part = targetPart
+  def setActivePart(action: IAction, targetPart: IWorkbenchPart) { part = targetPart }
 
-  def selectionChanged(action: IAction, selection: ISelection) = {
+  def selectionChanged(action: IAction, selection: ISelection) {
     selection match {
       case s: IStructuredSelection => selectedProjects = s.toArray().map(_.asInstanceOf[IProject])
       case _ =>
     }
   }
 
-  def run(action: IAction) = job(selectedProjects).schedule();
+  def run(action: IAction) { job(selectedProjects).schedule() }
 }
 
 // TODO when removing, the markers disappear. When adding, the project needs to get rebuilt. Ask?
 class AddScalastyleNatureAction extends ScalastyleNatureAction {
-  def job(projects: Array[IProject]) = new AddNatureJobs(projects)
+  def job(projects: Array[IProject]): WorkspaceJob = new AddNatureJobs(projects)
 
   class AddNatureJobs(projects: Array[IProject]) extends WorkspaceJob(Messages.addNatureToProjectsJob) {
     def runInWorkspace(monitor: IProgressMonitor): IStatus = {
@@ -87,7 +87,7 @@ class AddScalastyleNatureAction extends ScalastyleNatureAction {
 }
 
 class RemoveScalastyleNatureAction extends ScalastyleNatureAction {
-  def job(projects: Array[IProject]) = new RemoveNatureJobs(projects)
+  def job(projects: Array[IProject]): WorkspaceJob = new RemoveNatureJobs(projects)
 
   class RemoveNatureJobs(projects: Array[IProject]) extends WorkspaceJob(Messages.removeNatureFromProjectsJob) {
     def runInWorkspace(monitor: IProgressMonitor): IStatus = {

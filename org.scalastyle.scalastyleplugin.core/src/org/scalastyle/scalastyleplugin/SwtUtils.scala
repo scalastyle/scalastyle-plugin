@@ -30,8 +30,10 @@ import org.eclipse.jface.viewers._
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.window.Window;
 
+// scalastyle:off magic.number
+
 object SwtUtils {
-  def composite(parent: Composite, layoutData: Option[Any] = Some(defaultGridData), layout: Layout = defaultGridLayout) = {
+  def composite(parent: Composite, layoutData: Option[Any] = Some(defaultGridData), layout: Layout = defaultGridLayout): Composite = {
     val composite = new Composite(parent, SWT.NULL);
     if (layoutData.isDefined) {
       composite.setLayoutData(layoutData.get)
@@ -45,7 +47,7 @@ object SwtUtils {
   private[this] val defaultGridData = gridData()
   private[this] val defaultGridLayout = gridLayout(1)
 
-  def gridData(style: Int = GridData.FILL_BOTH) = new GridData(style)
+  def gridData(style: Int = GridData.FILL_BOTH): GridData = new GridData(style)
 
   def gridLayout(columns: Int = 1, margin: Int = 5): GridLayout = {
     val gridLayout = new GridLayout()
@@ -55,7 +57,7 @@ object SwtUtils {
     gridLayout
   }
 
-  def group(parent: Composite, label: String, layoutData: Option[Any] = Some(defaultGridData), layout: Layout = defaultGridLayout) = {
+  def group(parent: Composite, label: String, layoutData: Option[Any] = Some(defaultGridData), layout: Layout = defaultGridLayout): Group = {
     val group = new Group(parent, SWT.NULL)
 
     if (layoutData.isDefined) {
@@ -161,7 +163,7 @@ object SwtUtils {
     combo
   }
 
-  def formData() = {
+  def formData(): FormData = {
     val fd = new FormData()
     fd.left = new FormAttachment(0)
     fd.top = new FormAttachment(0)
@@ -198,7 +200,7 @@ object SwtUtils {
     tableViewer.setContentProvider(contentProvider)
 
     table.addListener(SWT.Selection, new Listener() {
-      def handleEvent(event: Event) = {
+      def handleEvent(event: Event) {
         val ss: StructuredSelection = tableViewer.getSelection().asInstanceOf[StructuredSelection];
         setSelection(ss.getFirstElement().asInstanceOf[T])
       }

@@ -81,14 +81,10 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
   private[this] def fromOption(s: Option[String]) = if (s.isDefined) s.get else ""
   private[this] def toOption(t: Text) = if (t.getText().size == 0) None else Some(t.getText())
 
-  def isNumeric(s: String): Boolean = s.forall(_.isDigit)
-  def isBoolean(s: String): Boolean = s.equals("true") || s.equals("false")
+  private[this] def isNumeric(s: String): Boolean = s.forall(_.isDigit)
+  private[this] def isBoolean(s: String): Boolean = s.equals("true") || s.equals("false")
 
-  override def okPressed(): Unit = {
-    val enabled = enabledCheckbox.getSelection()
-    val level = Level(severityCombo.getItem(severityCombo.getSelectionIndex()))
-
-    val errors = parameterControls.flatMap(s => s match {
+  private[this] def getErrors() = parameterControls.flatMap(s => s match {
       case (name, text) => {
         val contents = text.getText()
         val error = if (isEmpty(contents)) {
@@ -104,6 +100,11 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
       }
     })
 
+  override def okPressed(): Unit = {
+    val enabled = enabledCheckbox.getSelection()
+    val level = Level(severityCombo.getItem(severityCombo.getSelectionIndex()))
+
+    val errors = getErrors
     if (errors.size > 0) {
       val message = errors.map({ case (name, message) => "Parameter " + name + " " + message }).mkString("\n")
       MessageDialog.open(MessageDialog.ERROR, getShell(), "Scalastyle parameter error", message, SWT.OK)

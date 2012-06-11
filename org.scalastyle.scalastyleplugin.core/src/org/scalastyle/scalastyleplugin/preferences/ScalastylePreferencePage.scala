@@ -89,8 +89,10 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
   var Button: Button = _
   var tableViewer: TableViewer = _
 
+  val weight = 100
+
   private[this] val columns = List(
-    DialogColumn[Configuration]("Location", SWT.LEFT, LocationSorter, 100, { _.location }))
+    DialogColumn[Configuration]("Location", SWT.LEFT, LocationSorter, weight, { _.location }))
 
   def createContents(parent: Composite): Control = {
     noDefaultAndApplyButton()
@@ -131,12 +133,12 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
     parentComposite
   }
 
-  def addConfiguration(file: IFile) = {
+  private[this] def addConfiguration(file: IFile) = {
     model.elements = model.elements ::: List(Configuration(file.getFullPath().toString()))
     refresh()
   }
 
-  def removeConfiguration(configuration: Configuration) = {
+  private[this] def removeConfiguration(configuration: Configuration) = {
     model.elements = model.elements.filter(_.location != configuration.location)
     refresh()
     editButton.setEnabled(false);
@@ -197,11 +199,11 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
     }
   }
 
-  def toConfigurations(workspaceConfigurations: WorkspaceConfigurations) = {
+  private[this] def toConfigurations(workspaceConfigurations: WorkspaceConfigurations) = {
     Configurations(workspaceConfigurations.configurations.map(c => Configuration(c.file)))
   }
 
-  def toWorkspaceConfigurations(configurations: Configurations) = {
+  private[this] def toWorkspaceConfigurations(configurations: Configurations) = {
     WorkspaceConfigurations(configurations.elements.map(c => WorkspaceConfiguration(c.location)))
   }
 }

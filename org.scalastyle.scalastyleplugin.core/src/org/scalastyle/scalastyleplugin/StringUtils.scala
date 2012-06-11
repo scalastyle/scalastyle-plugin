@@ -19,5 +19,5 @@ import org.eclipse.core.runtime.CoreException
 
 object StringUtils {
   def toOption(s: String): Option[String] = if (isEmpty(s.trim())) None else Some(s.trim())
-  def isEmpty(s: String) = (s == null || s.trim() == "")
+  def isEmpty(s: String): Boolean = (s == null || s.trim() == "")
 }

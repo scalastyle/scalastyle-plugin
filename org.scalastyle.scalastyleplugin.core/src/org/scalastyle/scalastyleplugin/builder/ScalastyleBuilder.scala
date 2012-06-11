@@ -50,20 +50,20 @@ class EclipseFileSpec(val name: String, val resource: IResource) extends FileSpe
 object ScalastyleBuilder {
   val BuilderId = ScalastylePlugin.PluginId + ".ScalastyleBuilder" //$NON-NLS-1$
 
-  def buildProject(project: IProject) = {
+  def buildProject(project: IProject) {
     val buildJob = BuildProjectJob(project, IncrementalProjectBuilder.FULL_BUILD)
     buildJob.setRule(ResourcesPlugin.getWorkspace().getRoot());
     buildJob.schedule();
   }
 
-  def buildAllProjects() = {
+  def buildAllProjects() {
     val workspace = ResourcesPlugin.getWorkspace();
     val projects = workspace.getRoot().getProjects();
 
     buildProjects(projects);
   }
 
-  def buildProjects(projects: Array[IProject]) = {
+  def buildProjects(projects: Array[IProject]) {
     val scalastyleProjects = projects.filter(project => {
       project.exists() && project.isOpen() && project.hasNature(ScalastyleNature.NatureId) && Persistence.loadWorkspace().configurations.size > 0
     })
@@ -75,6 +75,8 @@ object ScalastyleBuilder {
 }
 
 class ScalastyleBuilder extends IncrementalProjectBuilder {
+  private val categoryId = 999
+
   def build(kind: Int, args: java.util.Map[_, _], monitor: IProgressMonitor): Array[IProject] = {
     // get the associated project for this builder
     val project = getProject();
@@ -98,7 +100,7 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
       val markerAttributes = Map[Object, Object](IMarker.PRIORITY -> Integer.valueOf(IMarker.PRIORITY_HIGH),
         IMarker.SEVERITY -> Integer.valueOf(IMarker.SEVERITY_ERROR),
         IMarker.MESSAGE -> ("Project builder is not in correct order (should be after scala builder) for project " + project.getName()),
-        "categoryId" -> Integer.valueOf(999));
+        "categoryId" -> Integer.valueOf(categoryId));
 
       // create a marker for the project
       MarkerUtilities.createMarker(project, markerAttributes, ScalastyleMarker.MarkerId);
@@ -134,7 +136,7 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
     }
   }
 
-  def isDeltaAddedOrChanged(delta: IResourceDelta) = (delta.getKind() == IResourceDelta.ADDED) || (delta.getKind() == IResourceDelta.CHANGED)
+  private def isDeltaAddedOrChanged(delta: IResourceDelta) = (delta.getKind() == IResourceDelta.ADDED) || (delta.getKind() == IResourceDelta.CHANGED)
 
   private[this] def accept(resource: IResource, filter: IFilter): Boolean = !filter.isEnabled() || filter.accept(resource)
   private[this] def accept(resource: IResource, filters: Array[IFilter]): Boolean = filters.size == 0 || filters.exists(accept(resource, _))
@@ -155,8 +157,8 @@ class ScalastyleBuilder extends IncrementalProjectBuilder {
 }
 
 trait IFilter {
-  def isEnabled() = true
-  def accept(resource: IResource) = "scala" == resource.getFileExtension()
+  def isEnabled(): Boolean = true
+  def accept(resource: IResource): Boolean = "scala" == resource.getFileExtension()
 }
 
 class EclipseOutput extends Output[EclipseFileSpec] {

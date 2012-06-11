@@ -40,7 +40,7 @@ object Persistence {
 
   import org.scalastyle.scalastyleplugin.StringUtils._
 
-  def workspaceConfigFile() = {
+  private def workspaceConfigFile() = {
     val configPath = ScalastylePlugin.getDefault().getStateLocation().append(WorkspaceConfigurationFile);
     configPath.toFile();
   }
@@ -59,7 +59,7 @@ object Persistence {
     // TODO error handling please
   }
 
-  def saveWorkspace(workspaceConfigurations: WorkspaceConfigurations) = {
+  def saveWorkspace(workspaceConfigurations: WorkspaceConfigurations) {
     write(workspaceConfigFile().getAbsolutePath(), toXml(workspaceConfigurations), xmlWidth, xmlStep)
   }
 
@@ -113,7 +113,7 @@ object Persistence {
     <scalastyle-project-configuration enabled={enabled}></scalastyle-project-configuration> % file
   }
 
-  def saveProject(project: IProject, projectConfiguration: ProjectConfiguration) = {
+  def saveProject(project: IProject, projectConfiguration: ProjectConfiguration) {
     write(projectConfigFile(project).getAbsolutePath(), toXml(projectConfiguration), xmlWidth, xmlStep)
   }
 

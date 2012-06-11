@@ -86,5 +86,5 @@ class ScalastyleNature extends IProjectNature {
   }
 
   def getProject: IProject = project
-  def setProject(project: IProject) = this.project = project
+  def setProject(project: IProject): Unit = this.project = project
 }

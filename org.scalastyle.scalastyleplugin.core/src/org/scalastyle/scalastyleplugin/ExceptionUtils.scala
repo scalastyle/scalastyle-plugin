@@ -32,7 +32,7 @@ object ExceptionUtils {
     eclipseLog().log(status);
   }
 
-  def errorDialog(shell: Shell, message: String, t: Throwable) = {
+  def errorDialog(shell: Shell, message: String, t: Throwable) {
     val status = new Status(IStatus.ERROR, ScalastylePlugin.PluginId, IStatus.OK, message, t);
 
     ErrorDialog.openError(shell, "Error", message, status);
