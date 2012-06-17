@@ -68,7 +68,10 @@ import org.scalastyle._
 import org.eclipse.jface.viewers.TableViewer
 import org.eclipse.ui.dialogs.SaveAsDialog
 import org.eclipse.core.resources.ResourcesPlugin
+import org.eclipse.core.resources.IWorkspaceRoot
+import org.eclipse.core.resources.IResource
 import org.eclipse.core.runtime.URIUtil
+import org.eclipse.core.runtime.NullProgressMonitor;
 
 case class Configuration(location: String) extends TableLine
 
@@ -122,6 +125,10 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
       }
     })
 
+    val newButton = button(configurationsGroup, "New", true, {
+      createNewConfiguration();
+    })
+
     editButton = button(configurationsGroup, "Edit", false, {
       editConfiguration(currentSelection)
     })
@@ -132,6 +139,39 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
 
     parentComposite
   }
+
+  private[this] def createNewConfiguration(): Unit = {
+    val root = ResourcesPlugin.getWorkspace().getRoot()
+    browseForNewFile(getShell(), "Select a file to create with the default configuration") match {
+      case Some(path) => {
+        val dfile = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+        dfile.create(classLoader.getResourceAsStream("/default_config.xml"), true, new NullProgressMonitor())
+
+        dfile.refreshLocal(IResource.DEPTH_ZERO, null)
+
+        addConfiguration(dfile)
+      }
+      case None =>
+    }
+  }
+
+  private[this] def browseForNewFile(shell: Shell, title: String): Option[Path] = {
+    val dialog = new SaveAsDialog(shell);
+    //    dialog.setTitle(title)
+    //    dialog.setMessage(title)
+    dialog.setOriginalName("scalastyle_configuration.xml")
+
+    dialog.setBlockOnOpen(true)
+
+    if (Window.OK == dialog.open()) {
+      val result = dialog.getResult();
+      val checkFile = result.asInstanceOf[Path];
+      Some(checkFile)
+    } else {
+      None
+    }
+  }
+
 
   private[this] def addConfiguration(file: IFile) = {
     model.elements = model.elements ::: List(Configuration(file.getFullPath().toString()))
