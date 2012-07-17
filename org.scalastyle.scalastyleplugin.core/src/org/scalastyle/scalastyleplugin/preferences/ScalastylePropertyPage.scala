@@ -71,7 +71,6 @@ class ScalastylePropertyPage extends PropertyPage {
   var model: PropertyModel = _
 
   def createContents(parent: Composite): Control = {
-    println("createContents")
     noDefaultAndApplyButton();
     val projectGroup = group(parent, "Project", layout = gridLayout(2))
 

@@ -76,10 +76,8 @@ class AddScalastyleNatureAction extends ScalastyleNatureAction {
   class AddNatureJob(project: IProject, natureId: String) extends AddRemoveNatureJob(natureId, Messages.addNatureToProjectJob) {
     def runInWorkspace(monitor: IProgressMonitor): IStatus = {
       runInWorkspace(monitor, {
-        println("natureId=" + natureId)
         val desc = project.getDescription()
         desc.setNatureIds(desc.getNatureIds() ++ Array(natureId))
-        desc.getNatureIds().foreach(ni => println(ni))
         project.setDescription(desc, monitor)
       })
     }
@@ -105,7 +103,6 @@ class RemoveScalastyleNatureAction extends ScalastyleNatureAction {
     def runInWorkspace(monitor: IProgressMonitor): IStatus = {
       runInWorkspace(monitor, {
         val desc = project.getDescription()
-        println("natureId=" + natureId)
         desc.setNatureIds(desc.getNatureIds().filter(_ != natureId))
         project.setDescription(desc, monitor)
       })

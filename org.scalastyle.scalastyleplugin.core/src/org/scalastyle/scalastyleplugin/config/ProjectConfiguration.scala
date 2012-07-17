@@ -80,10 +80,7 @@ object Persistence {
     <scalastyle-workspace-configuration>{ elements }</scalastyle-workspace-configuration>
   }
 
-  private[this] def projectConfigFile(project: IProject) = {
-    println("project config file=" + project.getFile(ProjectConfigurationFile).getLocation().toFile())
-    project.getFile(ProjectConfigurationFile).getLocation().toFile()
-  }
+  private[this] def projectConfigFile(project: IProject) = project.getFile(ProjectConfigurationFile).getLocation().toFile()
 
   def loadProject(project: IProject): ProjectConfiguration = {
     val configFile = projectConfigFile(project)
@@ -109,7 +106,6 @@ object Persistence {
       case Some(x) => Attribute(None, "file", Text(x), Null)
       case None => scala.xml.Null
     }
-    println("file=" + file)
     <scalastyle-project-configuration enabled={enabled}></scalastyle-project-configuration> % file
   }
 

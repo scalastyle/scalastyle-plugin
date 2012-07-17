@@ -145,7 +145,7 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
     browseForNewFile(getShell(), "Select a file to create with the default configuration") match {
       case Some(path) => {
         val dfile = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
-        dfile.create(classLoader.getResourceAsStream("/default_config.xml"), true, new NullProgressMonitor())
+        dfile.create(classLoader.getResourceAsStream(ScalastyleConfiguration.DefaultConfiguration), true, new NullProgressMonitor())
 
         dfile.refreshLocal(IResource.DEPTH_ZERO, null)
 
