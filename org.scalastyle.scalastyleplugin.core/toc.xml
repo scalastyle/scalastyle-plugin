@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?NLS TYPE="org.eclipse.help.toc"?>
 
-<toc label="Scalastyle plugin" topic="doc/index.html">
-	<topic label="Getting Started"                   		href="doc/getting_started.html">
+<toc label="Scalastyle plugin" topic="doc/eclipse-index.html">
+	<topic label="Getting Started"                   		href="doc/eclipse-getting_started.html">
 	</topic>
 </toc>

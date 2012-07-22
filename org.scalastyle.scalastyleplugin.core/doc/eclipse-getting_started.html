@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Scalastyle - Eclipse - Getting started" />
+    <meta http-equiv="refresh" content="60">
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Scalastyle - Eclipse - Getting started</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/scalastyle">View on GitHub</a>
+
+          <h1 id="project_title">Scalastyle - Eclipse - Getting started</h1>
+
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+	<p>To start using Scalastyle with your project, you need to add Scalastyle Nature to your project, set up a configuration for Scalastyle, then enable Scalastyle for that project.</p>
+
+<h3 id='add_scalastyle_nature_to_your_project'>Add Scalastyle Nature to your project</h3>
+
+<p>The Scalastyle plugin uses a project builder to check your Scala files against your configuration. Each time you modify a scala file, the file will be checked against your configuration when the file is saved. To add this builder to your project, go to the project in the Project Explorer and select <strong>Scalastyle-&gt;Add Scalastyle Nature</strong></p>
+
+<h3 id='add_a_configuration_file_to_your_project'>Add a configuration file to your project</h3>
+
+<p>Scalastyle requires a configuration file which tells it which rules to apply to your code. The easiest way to begin is to copy the file:</p>
+<a href='https://github.com/scalastyle/scalastyle/blob/master/lib/scalastyle_config.xml'>https://github.com/scalastyle/scalastyle/blob/master/lib/scalastyle_config.xml</a>
+<p>This is the configuration we use with Scalastyle, so it&#8217;s the best as well :-) Store this file somewhere in your project tree, where it will be accessible from Eclipse.</p>
+
+<h3 id='add_the_configuration_file_to_the_list_of_available_configuration_files'>Add the configuration file to the list of available configuration files</h3>
+
+<p>In the Workspace Preferences, select the Scalastyle configuration page. You can then add the file you&#8217;ve just copied into your project into that list.</p>
+
+<h3 id='select_the_configuration_for_your_project'>Select the configuration for your project.</h3>
+
+<p>Finally, back in the project preferences, go and select the configuration in the drop down list, and ensure that the Enabled checkbox is ticked. <br />Do a project clean and build, and you should see Scalastyle errors appear in your problems view.</p>
+
+<h3 id='modify_the_configuration'>Modify the configuration.</h3>
+
+<p>In the workspace preferences, you can modify the rules to check by selecting the configuration and clicking on Edit.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+      </footer>
+    </div>
+  </body>
+</html>
