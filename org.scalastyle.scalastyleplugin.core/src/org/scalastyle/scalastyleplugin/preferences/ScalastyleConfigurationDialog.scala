@@ -85,7 +85,7 @@ case class Model(definition: ScalastyleDefinition, configuration: ScalastyleConf
   def toConfiguration(name: String): ScalastyleConfiguration = {
     val checkers = list.map(mc => ConfigurationChecker(mc.configurationChecker.className, mc.configurationChecker.level,
                                 mc.configurationChecker.enabled, mc.configurationChecker.parameters, mc.configurationChecker.customMessage))
-    ScalastyleConfiguration(name, checkers)
+    ScalastyleConfiguration(name, configuration.commentFilter, checkers)
   }
 }
 
