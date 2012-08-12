@@ -82,10 +82,10 @@ case class Model(definition: ScalastyleDefinition, configuration: ScalastyleConf
 
   def dirty: Boolean = list.find(_.dirty).isDefined
 
-  def toConfiguration(name: String): ScalastyleConfiguration = {
+  def toConfiguration(name: String, ignoreCommentFilters: Boolean): ScalastyleConfiguration = {
     val checkers = list.map(mc => ConfigurationChecker(mc.configurationChecker.className, mc.configurationChecker.level,
                                 mc.configurationChecker.enabled, mc.configurationChecker.parameters, mc.configurationChecker.customMessage))
-    ScalastyleConfiguration(name, configuration.commentFilter, checkers)
+    ScalastyleConfiguration(name, ignoreCommentFilters, checkers)
   }
 }
 
@@ -98,6 +98,7 @@ class ScalastyleConfigurationDialog(parent: Shell, filename: String) extends Tit
   val model = new Model(definition, configuration)
   val messageHelper = new MessageHelper(classLoader)
   var nameText: Text = _
+  var enableCommentFilterButton: Button = _
   var editButton: Button = _
   var newButton: Button = _
   var currentSelection: Option[ModelChecker] = None;
@@ -124,11 +125,17 @@ class ScalastyleConfigurationDialog(parent: Shell, filename: String) extends Tit
     val headerComposite = composite(contents, layout = gridLayout(2), layoutData = Some(gridData()));
     label(headerComposite, "Name")
     nameText = text(headerComposite, model.configuration.name, true, false)
+    label(headerComposite, "Comment Filters")
+    enableCommentFilterButton = checkbox(headerComposite, model.configuration.commentFilter)
 
     val checkerGroup = group(contents, "Checkers")
 
+    val tableGridData = new GridData(GridData.FILL_HORIZONTAL)
+    tableGridData.heightHint = 500
+    tableGridData.grabExcessHorizontalSpace = true
+
     tableViewer = table(checkerGroup, model, columns, new ModelContentProvider[ModelChecker](model),
-                        new PropertiesLabelProvider(columns), setSelection, refresh)
+                        new PropertiesLabelProvider(columns), setSelection, refresh, layoutData = tableGridData)
 
     editButton = button(contents, "Edit", false, { editChecker(currentSelection) })
 
@@ -160,7 +167,7 @@ class ScalastyleConfigurationDialog(parent: Shell, filename: String) extends Tit
     } else {
         if (nameText.getText() != model.configuration.name || model.dirty) {
           handleError(getShell()) {
-            Persistence.saveConfiguration(file.get.getAbsolutePath(), model.toConfiguration(nameText.getText()))
+            Persistence.saveConfiguration(file.get.getAbsolutePath(), model.toConfiguration(nameText.getText(), enableCommentFilterButton.getSelection()))
             super.okPressed();
           }
         } else {
