@@ -3,10 +3,16 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
   xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
+   <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
   <groupId>org.scalastyle</groupId>
   <artifactId>org.scalastyle.scalastyleplugin</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <description>Scalastyle Eclipse plugin</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -129,4 +135,33 @@
       </plugin>
     </plugins>
   </build>
+  
+  <url>http://www.scalastyle.org</url>
+  <organization>
+    <name>Scalastyle Organization</name>
+    <url>https://github.com/scalastyle</url>
+  </organization>
+  <scm>
+	<connection>scm:git:git@github.com:scalastyle/scalastyle-plugin.git</connection>
+	<url>scm:git:git@github.com:scalastyle/scalastyle-plugin.git</url>
+	<developerConnection>scm:git:git@github.com:scalastyle/scalastyle-plugin.git</developerConnection>
+  </scm>
+  <issueManagement>
+    <system>Github</system>
+    <url>https://github.com/scalastyle/scalastyle-plugin/issues</url>
+  </issueManagement>
+  <licenses>
+    <license>
+      <name>Apache 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>matthewfarwell</id>
+      <name>Matthew Farwell</name>
+      <url>http://www.farwell.co.uk</url>
+    </developer>
+  </developers>
 </project>
