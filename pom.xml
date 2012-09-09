@@ -10,7 +10,7 @@
   </parent>
   <groupId>org.scalastyle</groupId>
   <artifactId>org.scalastyle.scalastyleplugin</artifactId>
-  <version>0.1.1-SNAPSHOT</version>
+  <version>0.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>Scalastyle Eclipse plugin</description>
 
@@ -19,9 +19,9 @@
     <miglayout.version>3.7.4</miglayout.version>
     <log4j.version>1.2.16</log4j.version>
     <tycho.version>0.12.0</tycho.version>
-    <scala.version>2.9.1</scala.version>
-    <scalastyle.version>0.1.1-SNAPSHOT</scalastyle.version>
-    <scalariform.version>0.1.1</scalariform.version>
+    <scala.version>2.9.2</scala.version>
+    <scalastyle.version>0.2.0-SNAPSHOT</scalastyle.version>
+    <scalariform.version>0.1.2</scalariform.version>
 	<plugin.version>${project.version}</plugin.version>
 	<plugin.id>${project.groupId}.${project.artifactId}</plugin.id>
 	<feature.id>${plugin.id}.feature</feature.id>
