@@ -38,7 +38,7 @@ import org.scalastyle.scalastyleplugin.ExceptionUtils._
 import org.scalastyle.scalastyleplugin.ScalastylePluginException
 import org.scalastyle.scalastyleplugin.nature.ScalastyleNature
 import org.scalastyle.ScalastyleConfiguration
-import org.scalastyle.TextOutput
+import org.scalastyle.Output
 import org.scalastyle.scalastyleplugin.config._
 import org.scalastyle.ScalastyleChecker
 import org.scalastyle._
@@ -198,7 +198,7 @@ class EclipseOutput extends Output[EclipseFileSpec] {
       "categoryId" -> 999)
 
     MarkerUtilities.setLineNumber(markerAttributes, error.lineNumber.getOrElse(1))
-    MarkerUtilities.setMessage(markerAttributes, findMessage(messageHelper, error.clazz, error.key, error.args, error.customMessage))
+    MarkerUtilities.setMessage(markerAttributes, Output.findMessage(messageHelper, error.clazz, error.key, error.args, error.customMessage))
 
     // create a marker for the file
     MarkerUtilities.createMarker(error.fileSpec.resource, markerAttributes, ScalastyleMarker.MarkerId)
