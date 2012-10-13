@@ -1,4 +1,4 @@
-<scalastyle>
+<scalastyle commentFilter="enabled">
  <name>Scalastyle standard configuration</name>
  <check level="warning" class="org.scalastyle.file.FileTabChecker" enabled="true"></check>
  <check level="warning" class="org.scalastyle.file.FileLengthChecker" enabled="true">
@@ -114,4 +114,14 @@
  <check level="warning" class="org.scalastyle.scalariform.PublicMethodsHaveTypeChecker" enabled="true"></check>
  <check level="warning" class="org.scalastyle.file.NewLineAtEofChecker" enabled="false"></check>
  <check level="warning" class="org.scalastyle.file.NoNewLineAtEofChecker" enabled="false"></check>
+ <check level="warning" class="org.scalastyle.scalariform.WhileChecker" enabled="false"></check>
+ <check level="warning" class="org.scalastyle.scalariform.VarFieldChecker" enabled="false"></check>
+ <check level="warning" class="org.scalastyle.scalariform.VarLocalChecker" enabled="false"></check>
+ <check level="warning" class="org.scalastyle.scalariform.RedundantIfChecker" enabled="true"></check>
+ <check level="warning" class="org.scalastyle.scalariform.TokenChecker" enabled="false">
+  <parameters>
+   <parameter name="regex"><![CDATA[^$]]></parameter>
+  </parameters>
+ </check>
+ <check level="warning" class="org.scalastyle.scalariform.DeprecatedJavaChecker" enabled="true"></check>
 </scalastyle>
