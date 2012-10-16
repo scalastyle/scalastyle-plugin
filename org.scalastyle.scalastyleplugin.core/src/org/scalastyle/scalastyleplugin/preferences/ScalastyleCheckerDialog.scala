@@ -16,16 +16,31 @@
 
 package org.scalastyle.scalastyleplugin.preferences;
 
-import org.eclipse.jface.dialogs.TitleAreaDialog;
-import org.eclipse.swt.widgets._;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout._;
-import org.eclipse.swt.events._;
-import org.eclipse.jface.dialogs._;
-import org.scalastyle._;
-import org.scalastyle.scalastyleplugin.SwtUtils._;
-import org.scalastyle.scalastyleplugin.StringUtils._;
+import org.eclipse.jface.dialogs.MessageDialog
+import org.eclipse.jface.dialogs.TitleAreaDialog
+import org.eclipse.swt.layout.GridData
+import org.eclipse.swt.widgets.Button
+import org.eclipse.swt.widgets.Combo
+import org.eclipse.swt.widgets.Composite
+import org.eclipse.swt.widgets.Control
+import org.eclipse.swt.widgets.Shell
+import org.eclipse.swt.widgets.Text
+import org.eclipse.swt.SWT
+import org.scalastyle.scalastyleplugin.StringUtils.isEmpty
+import org.scalastyle.scalastyleplugin.SwtUtils.checkbox
+import org.scalastyle.scalastyleplugin.SwtUtils.combo
+import org.scalastyle.scalastyleplugin.SwtUtils.composite
+import org.scalastyle.scalastyleplugin.SwtUtils.gridData
+import org.scalastyle.scalastyleplugin.SwtUtils.gridLayout
+import org.scalastyle.scalastyleplugin.SwtUtils.group
+import org.scalastyle.scalastyleplugin.SwtUtils.label
+import org.scalastyle.scalastyleplugin.SwtUtils.text
 import org.scalastyle.scalastyleplugin.ScalastylePlugin
+import org.scalastyle.BooleanType
+import org.scalastyle.IntegerType
+import org.scalastyle.Level
+import org.scalastyle.MessageHelper
+import org.scalastyle.StringType
 
 class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, modelChecker: ModelChecker) extends TitleAreaDialog(parent) {
   setShellStyle(getShellStyle() | SWT.RESIZE);

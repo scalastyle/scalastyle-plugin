@@ -17,15 +17,19 @@
 package org.scalastyle.scalastyleplugin.config
 
 import scala.xml.NodeSeq.seqToNodeSeq
+import scala.xml.Attribute
 import scala.xml.Elem
 import scala.xml.Node
-import scala.xml._
+import scala.xml.Null
+import scala.xml.Text
+import scala.xml.XML
 
 import org.eclipse.core.resources.IProject
+import org.eclipse.core.resources.ResourcesPlugin
+import org.scalastyle.scalastyleplugin.StringUtils.isEmpty
 import org.scalastyle.scalastyleplugin.ScalastylePlugin
 import org.scalastyle.ScalastyleConfiguration
 import org.scalastyle.XmlPrettyPrinter
-import org.eclipse.core.resources.ResourcesPlugin
 
 case class WorkspaceConfiguration(file: String)
 case class WorkspaceConfigurations(configurations: List[WorkspaceConfiguration])
@@ -37,8 +41,6 @@ object Persistence {
   val ProjectConfigurationFile = ".scalastyle"
   val xmlWidth = 1000
   val xmlStep = 1
-
-  import org.scalastyle.scalastyleplugin.StringUtils._
 
   private def workspaceConfigFile() = {
     val configPath = ScalastylePlugin.getDefault().getStateLocation().append(WorkspaceConfigurationFile);

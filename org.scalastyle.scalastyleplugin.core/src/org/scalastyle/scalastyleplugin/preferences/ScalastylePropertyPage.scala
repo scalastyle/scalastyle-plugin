@@ -16,50 +16,22 @@
 
 package org.scalastyle.scalastyleplugin.preferences
 
-import java.util.Iterator;
-import java.util.List;
-
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IncrementalProjectBuilder;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
-import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.window.Window;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.dialogs.PropertyPage;
-import org.scalastyle.scalastyleplugin.SwtUtils._
-import org.scalastyle.scalastyleplugin.ExceptionUtils._
-import org.scalastyle.scalastyleplugin.config._
+import org.eclipse.core.resources.IProject
+import org.eclipse.core.runtime.IAdaptable
+import org.eclipse.swt.widgets.Button
+import org.eclipse.swt.widgets.Combo
+import org.eclipse.swt.widgets.Composite
+import org.eclipse.swt.widgets.Control
+import org.eclipse.ui.dialogs.PropertyPage
+import org.scalastyle.scalastyleplugin.ExceptionUtils.handleError
+import org.scalastyle.scalastyleplugin.SwtUtils.checkbox
+import org.scalastyle.scalastyleplugin.SwtUtils.combo
+import org.scalastyle.scalastyleplugin.SwtUtils.gridLayout
+import org.scalastyle.scalastyleplugin.SwtUtils.group
+import org.scalastyle.scalastyleplugin.SwtUtils.label
+import org.scalastyle.scalastyleplugin.config.Persistence
+import org.scalastyle.scalastyleplugin.config.ProjectConfiguration
+import org.scalastyle.scalastyleplugin.config.WorkspaceConfigurations
 
 case class PropertyModel(enabled: Boolean, configuration: Option[String])
 

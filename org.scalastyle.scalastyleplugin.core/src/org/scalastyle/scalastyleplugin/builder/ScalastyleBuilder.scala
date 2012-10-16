@@ -16,34 +16,42 @@
 
 package org.scalastyle.scalastyleplugin.builder
 
+import scala.Array.canBuildFrom
+import scala.Option.option2Iterable
+import scala.collection.JavaConversions.mutableMapAsJavaMap
+import scala.collection.mutable.HashMap
+
 import org.eclipse.core.resources.IContainer
-import org.eclipse.core.resources.IFile
 import org.eclipse.core.resources.IMarker
 import org.eclipse.core.resources.IProject
 import org.eclipse.core.resources.IResource
 import org.eclipse.core.resources.IResourceDelta
-import org.eclipse.core.resources.IWorkspace
 import org.eclipse.core.resources.IncrementalProjectBuilder
 import org.eclipse.core.resources.ResourcesPlugin
-import org.eclipse.core.runtime.CoreException
 import org.eclipse.core.runtime.IProgressMonitor
-import org.eclipse.core.runtime.IStatus
-import org.eclipse.core.runtime.Status
-import org.eclipse.osgi.util.NLS
 import org.eclipse.ui.texteditor.MarkerUtilities
-import scala.collection.mutable.ListBuffer
-import scala.collection.mutable.HashMap
-import org.scalastyle.scalastyleplugin.ScalastylePlugin
-import org.scalastyle.scalastyleplugin.ExceptionUtils._
-import org.scalastyle.scalastyleplugin.ScalastylePluginException
+import org.scalastyle.scalastyleplugin.ExceptionUtils.handleException
+import org.scalastyle.scalastyleplugin.config.Persistence
 import org.scalastyle.scalastyleplugin.nature.ScalastyleNature
-import org.scalastyle.ScalastyleConfiguration
+import org.scalastyle.scalastyleplugin.ScalastylePlugin
+import org.scalastyle.scalastyleplugin.ScalastylePluginException
+import org.scalastyle.Message
+import org.scalastyle.StyleError
+import org.scalastyle.EndFile
+import org.scalastyle.EndWork
+import org.scalastyle.ErrorLevel
+import org.scalastyle.MessageHelper
 import org.scalastyle.Output
-import org.scalastyle.scalastyleplugin.config._
+import org.scalastyle.RealFileSpec
 import org.scalastyle.ScalastyleChecker
-import org.scalastyle._
-import scala.collection.JavaConversions._
-import org.eclipse.jface.dialogs.MessageDialog
+import org.scalastyle.ScalastyleConfiguration
+import org.scalastyle.StartFile
+import org.scalastyle.StartWork
+import org.scalastyle.StyleException
+import org.scalastyle.WarningLevel
+
+import ScalastyleBuilder.createMarker
+import ScalastyleBuilder.root
 
 class EclipseFileSpec(name: String, encoding: String, val resource: IResource) extends RealFileSpec(name, Some(encoding))
 
@@ -91,8 +99,6 @@ object ScalastyleBuilder {
 }
 
 class ScalastyleBuilder extends IncrementalProjectBuilder {
-  import ScalastyleBuilder._
-
   private val categoryId = 999
 
   def build(kind: Int, args: java.util.Map[_, _], monitor: IProgressMonitor): Array[IProject] = {
@@ -178,7 +184,6 @@ trait IFilter {
 }
 
 class EclipseOutput extends Output[EclipseFileSpec] {
-  import ScalastyleBuilder._
 
   private val messageHelper = new MessageHelper(this.getClass().getClassLoader())
 

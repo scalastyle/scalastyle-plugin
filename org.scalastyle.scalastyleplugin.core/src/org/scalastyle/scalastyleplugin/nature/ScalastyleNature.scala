@@ -16,19 +16,15 @@
 
 package org.scalastyle.scalastyleplugin.nature
 
-import org.eclipse.core.resources.ICommand;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.IProjectNature;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jdt.core.JavaCore;
-
-import org.scalastyle.scalastyleplugin.ExceptionUtils._
-import org.scalastyle.scalastyleplugin.ScalastylePlugin
+import org.eclipse.core.resources.ICommand
+import org.eclipse.core.resources.IProject
+import org.eclipse.core.resources.IProjectNature
+import org.eclipse.core.resources.IResource
+import org.eclipse.core.runtime.NullProgressMonitor
+import org.scalastyle.scalastyleplugin.ExceptionUtils.handleException
 import org.scalastyle.scalastyleplugin.builder.ScalastyleBuilder
 import org.scalastyle.scalastyleplugin.builder.ScalastyleMarker
+import org.scalastyle.scalastyleplugin.ScalastylePlugin
 
 object ScalastyleNature {
   val NatureId = ScalastylePlugin.PluginId + ".ScalastyleNature"

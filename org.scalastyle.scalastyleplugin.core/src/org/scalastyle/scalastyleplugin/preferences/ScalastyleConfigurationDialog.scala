@@ -16,25 +16,43 @@
 
 package org.scalastyle.scalastyleplugin.preferences
 
-import org.eclipse.jface.dialogs._;
-import org.eclipse.jface.viewers._;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.events._;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout._;
-import org.eclipse.swt.widgets.{List => _, _}
-import org.eclipse.jface.dialogs.Dialog;
-import org.scalastyle._;
-import org.eclipse.jface.viewers._
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.window.Window;
-import org.scalastyle.scalastyleplugin.ScalastylePlugin;
-import org.scalastyle.scalastyleplugin.SwtUtils._
-import org.scalastyle.scalastyleplugin.StringUtils._
-import org.scalastyle.scalastyleplugin.ExceptionUtils._
+import org.eclipse.jface.dialogs.MessageDialog
+import org.eclipse.jface.dialogs.TitleAreaDialog
+import org.eclipse.jface.viewers.TableViewer
+import org.eclipse.jface.window.Window
+import org.eclipse.swt.layout.GridData
+import org.eclipse.swt.widgets.Button
+import org.eclipse.swt.widgets.Composite
+import org.eclipse.swt.widgets.Control
+import org.eclipse.swt.widgets.Shell
+import org.eclipse.swt.widgets.Text
+import org.eclipse.swt.SWT
+import org.scalastyle.scalastyleplugin.ExceptionUtils.handleError
+import org.scalastyle.scalastyleplugin.StringUtils.isEmpty
+import org.scalastyle.scalastyleplugin.SwtUtils.ModelContentProvider
+import org.scalastyle.scalastyleplugin.SwtUtils.TableSorter
+import org.scalastyle.scalastyleplugin.SwtUtils.Container
+import org.scalastyle.scalastyleplugin.SwtUtils.DialogColumn
+import org.scalastyle.scalastyleplugin.SwtUtils.PropertiesLabelProvider
+import org.scalastyle.scalastyleplugin.SwtUtils.TableLine
+import org.scalastyle.scalastyleplugin.SwtUtils.button
+import org.scalastyle.scalastyleplugin.SwtUtils.checkbox
+import org.scalastyle.scalastyleplugin.SwtUtils.composite
+import org.scalastyle.scalastyleplugin.SwtUtils.gridData
+import org.scalastyle.scalastyleplugin.SwtUtils.gridLayout
+import org.scalastyle.scalastyleplugin.SwtUtils.group
+import org.scalastyle.scalastyleplugin.SwtUtils.label
+import org.scalastyle.scalastyleplugin.SwtUtils.table
+import org.scalastyle.scalastyleplugin.SwtUtils.text
 import org.scalastyle.scalastyleplugin.config.Persistence
+import org.scalastyle.scalastyleplugin.ScalastylePlugin
+import org.scalastyle.ConfigurationChecker
+import org.scalastyle.DefinitionChecker
+import org.scalastyle.Level
+import org.scalastyle.MessageHelper
+import org.scalastyle.ParameterType
+import org.scalastyle.ScalastyleConfiguration
+import org.scalastyle.ScalastyleDefinition
 
 // scalastyle:off magic.number
 
