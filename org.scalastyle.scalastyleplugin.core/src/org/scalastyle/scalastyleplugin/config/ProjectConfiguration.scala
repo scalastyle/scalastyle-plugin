@@ -138,7 +138,7 @@ object Persistence {
       out = new java.io.BufferedWriter(new java.io.FileWriter(filename))
       out.write(s)
     } catch {
-      case e => throw e
+      case e: Exception => throw e
     } finally {
       try {
         if (out != null) {
