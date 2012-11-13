@@ -1,7 +1,7 @@
-eclipse_dir="/d/utils/eclipse/eclipse-jee-helios-SR2-win32-scala/eclipse"
+eclipse_dir="/c/code/eclipse/eclipse-jee-helios-SR2-win32-scala/eclipse"
 eclipse_opt="-nosplash -consoleLog"
 app="org.eclipse.equinox.p2.director"
-update_site="file:/D:/code/scalastyle/scalastyle-plugin/org.scalastyle.scalastyleplugin.update-site/target/site/"
+update_site="file:/C:/code/scalastyle/scalastyle-plugin/org.scalastyle.scalastyleplugin.update-site/target/site/"
 eclipse_repo="http://download.eclipse.org/releases/helios/"
 feature="org.scalastyle.scalastyleplugin.feature"
 
