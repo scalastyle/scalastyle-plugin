@@ -6,6 +6,6 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="lib/scalariform_2.9.2-0.1.2.jar"/>
-	<classpathentry kind="lib" path="lib/scalastyle_2.9.2-0.2.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/scalastyle_2.9.2-0.2.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
