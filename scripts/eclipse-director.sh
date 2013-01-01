@@ -1,9 +1,24 @@
-eclipse_dir="/c/code/eclipse/eclipse-jee-helios-SR2-win32-scala/eclipse"
+#! /bin/sh
+
 eclipse_opt="-nosplash -consoleLog"
 app="org.eclipse.equinox.p2.director"
 update_site="file:/C:/code/scalastyle/scalastyle-plugin/org.scalastyle.scalastyleplugin.update-site/target/site/"
-eclipse_repo="http://download.eclipse.org/releases/helios/"
 feature="org.scalastyle.scalastyleplugin.feature"
+
+indigo()
+{
+	eclipse_dir="/c/code/eclipse/eclipse-jee-indigo-SR2-win32-x86_64/eclipse"
+	
+	eclipse_repo="http://download.eclipse.org/releases/indigo/"
+	echo using indigo
+}
+
+helios()
+{
+	eclipse_dir="/c/code/eclipse/eclipse-jee-helios-SR2-win32-scala/eclipse"
+	eclipse_repo="http://download.eclipse.org/releases/helios/"
+	echo using helios
+}
 
 usage()
 {
@@ -30,6 +45,12 @@ uninstall()
 	ls -l $eclipse_dir/plugins/org.scalastyle.scalastyleplugin*
 	echo done
 }
+
+case $1 in
+helios)	helios; shift;;
+indigo) indigo; shift;;
+*)	indigo;;
+esac
 
 case $1 in 
 "" | "help")	usage ;;
