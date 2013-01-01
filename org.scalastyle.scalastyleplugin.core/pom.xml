@@ -15,7 +15,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <miglayout.version>3.7.4</miglayout.version>
     <log4j.version>1.2.16</log4j.version>
-    <tycho.version>0.12.0</tycho.version>
+    <tycho.version>0.15.0</tycho.version>
     <scala.version>2.9.2</scala.version>
     <scalastyle.version>0.2.0</scalastyle.version>
     <scalariform.version>0.1.2</scalariform.version>
@@ -28,17 +28,6 @@
       <version>${scalastyle.version}</version>
     </dependency>
   </dependencies>
-  <repositories>
-    <repository>
-      <id>Helios</id>
-      <name>Eclipse Helios p2 repository</name>
-      <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/helios/</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
   <build>
     <plugins>
       <plugin>

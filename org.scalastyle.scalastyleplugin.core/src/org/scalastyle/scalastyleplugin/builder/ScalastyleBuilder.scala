@@ -98,10 +98,10 @@ object ScalastyleBuilder {
   }
 }
 
-class ScalastyleBuilder extends IncrementalProjectBuilder {
+class ScalastyleBuilder extends JavaScalastyleBuilder {
   private val categoryId = 999
 
-  def build(kind: Int, args: java.util.Map[_, _], monitor: IProgressMonitor): Array[IProject] = {
+  def delegatedBuild(kind: Int, monitor: IProgressMonitor): Array[IProject] = {
     // get the associated project for this builder
     val project = getProject();
 
