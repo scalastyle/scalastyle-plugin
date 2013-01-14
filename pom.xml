@@ -139,6 +139,13 @@
 
   <profiles>
     <profile>
+      <id>juno</id>
+      <properties>
+        <eclipse.codename>juno</eclipse.codename>
+        <repo.eclipse>http://download.eclipse.org/releases/juno/</repo.eclipse>
+      </properties>
+    </profile>
+    <profile>
       <id>helios</id>
       <properties>
         <eclipse.codename>helios</eclipse.codename>

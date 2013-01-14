@@ -5,6 +5,14 @@ app="org.eclipse.equinox.p2.director"
 update_site="file:/C:/code/scalastyle/scalastyle-plugin/org.scalastyle.scalastyleplugin.update-site/target/site/"
 feature="org.scalastyle.scalastyleplugin.feature"
 
+juno()
+{
+	eclipse_dir="/c/code/eclipse/juno/eclipse"
+	
+	eclipse_repo="http://download.eclipse.org/releases/juno/"
+	echo using juno
+}
+
 indigo()
 {
 	eclipse_dir="/c/code/eclipse/eclipse-jee-indigo-SR2-win32-x86_64/eclipse"
@@ -49,6 +57,7 @@ uninstall()
 case $1 in
 helios)	helios; shift;;
 indigo) indigo; shift;;
+juno) juno; shift;;
 *)	indigo;;
 esac
 
