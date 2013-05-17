@@ -6,25 +6,15 @@
   <parent>
     <groupId>org.scalastyle</groupId>
     <artifactId>org.scalastyle.scalastyleplugin</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
   </parent>
   <artifactId>org.scalastyle.scalastyleplugin.core</artifactId>
   <packaging>eclipse-plugin</packaging>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <miglayout.version>3.7.4</miglayout.version>
-    <log4j.version>1.2.16</log4j.version>
-    <tycho.version>0.15.0</tycho.version>
-    <scala.version>2.9.2</scala.version>
-    <scalastyle.version>0.2.0</scalastyle.version>
-    <scalariform.version>0.1.2</scalariform.version>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.scalastyle</groupId>
-      <artifactId>scalastyle_${scala.version}</artifactId>
+      <artifactId>${scalastyle.artifactId}</artifactId>
       <version>${scalastyle.version}</version>
     </dependency>
   </dependencies>
@@ -127,15 +117,15 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.scalastyle</groupId>
-                  <artifactId>scalastyle_${scala.version}</artifactId>
+                  <artifactId>${scalastyle.artifactId}</artifactId>
                   <version>${scalastyle.version}</version>
                   <outputDirectory>${basedir}/lib</outputDirectory>
-                  <destFileName>scalastyle_${scala.version}-${scalastyle.version}.jar</destFileName>
+                  <destFileName>${scalastyle.artifactId}-${scalastyle.version}.jar</destFileName>
                   <overWrite>true</overWrite>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.scalariform</groupId>
-                  <artifactId>scalariform_${scala.version}</artifactId>
+                  <artifactId>${scalariform.artifactId}</artifactId>
                   <version>${scalariform.version}</version>
                   <outputDirectory>${basedir}/lib</outputDirectory>
                 </artifactItem>

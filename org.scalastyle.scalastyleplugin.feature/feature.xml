@@ -2,7 +2,7 @@
 <feature
       id="org.scalastyle.scalastyleplugin.feature"
       label="Scalastyle Plugin"
-      version="0.2.0">
+      version="0.3.0">
 
 
    <description url="https://github.com/scalastyle">

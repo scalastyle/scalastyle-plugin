@@ -5,10 +5,9 @@
   <parent>
     <groupId>org.scalastyle</groupId>
     <artifactId>org.scalastyle.scalastyleplugin</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
   </parent>
   <artifactId>org.scalastyle.scalastyleplugin.feature</artifactId>
-  <version>0.2.0</version>
   <packaging>eclipse-feature</packaging>
 
 </project>
