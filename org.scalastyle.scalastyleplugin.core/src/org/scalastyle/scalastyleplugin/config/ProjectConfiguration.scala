@@ -145,7 +145,7 @@ object Persistence {
           out.close();
         }
       } catch {
-        case _ => // do nothing, just ignore
+        case _: Throwable => // do nothing, just ignore
       }
     }
   }

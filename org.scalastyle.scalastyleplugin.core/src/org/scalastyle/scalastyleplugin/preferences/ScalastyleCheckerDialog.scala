@@ -49,6 +49,7 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
   var severityCombo: Combo = _
   var parameterControls = Map[String, Text]()
   var customMessageText: Text = _
+  var customIdText: Text = _
 
   override def createDialogArea(parent: Composite): Control = {
     setTitleImage(ScalastylePlugin.PluginLogo);
@@ -78,6 +79,9 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
 
     label(allContents, "Custom Message")
     customMessageText = text(allContents, fromOption(modelChecker.configurationChecker.customMessage), true, false)
+
+    label(allContents, "Custom ID")
+    customIdText = text(allContents, fromOption(modelChecker.configurationChecker.customId), true, false)
 
     if (modelChecker.configurationChecker.parameters.size > 0) {
       val parameterGroup = group(contents, "Parameters", layout = gridLayout(2), layoutData = Some(gridData(GridData.FILL_HORIZONTAL)))
@@ -126,7 +130,7 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
     } else {
       val parameters = parameterControls.map({ case (name, text) => (name, text.getText()) }).toMap
 
-      modelChecker.set(level, enabled, parameters, toOption(customMessageText))
+      modelChecker.set(level, enabled, parameters, toOption(customMessageText), toOption(customIdText))
 
       super.okPressed()
     }
