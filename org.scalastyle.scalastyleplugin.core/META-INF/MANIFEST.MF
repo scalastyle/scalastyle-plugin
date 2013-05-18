@@ -20,7 +20,7 @@ Require-Bundle: org.eclipse.ui,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/scalariform_2.10-0.1.4.jar,
- lib/scalastyle_2.10-0.3.0-SNAPSHOT.jar,
+ lib/scalastyle_2.10-0.3.0.jar,
  lib/scala-library-2.10.0.jar,
  .,
  bin/
