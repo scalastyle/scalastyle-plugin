@@ -47,6 +47,8 @@ import org.eclipse.swt.widgets.Table
 import org.eclipse.swt.widgets.TableColumn
 import org.eclipse.swt.widgets.Text
 import org.eclipse.swt.SWT
+import org.eclipse.jface.viewers.IDoubleClickListener
+import org.eclipse.jface.viewers.DoubleClickEvent
 
 // scalastyle:off magic.number
 
@@ -193,7 +195,7 @@ object SwtUtils {
   case class DialogColumn[T](name: String, alignment: Int, sorter: TableSorter[T, String], weight: Int, getText: (T) => String)
 
   def table[T](parent: Composite, model: Any, columns: List[DialogColumn[T]], contentProvider: IStructuredContentProvider,
-                  labelProvider: ITableLabelProvider, setSelection: (T) => Unit, refresh: => Unit,
+                  labelProvider: ITableLabelProvider, setSelection: (T) => Unit, refresh: => Unit, dblClick: => Unit,
                   layoutData: Any = new GridData(GridData.FILL_BOTH)): TableViewer = {
     val table = new Table(parent, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION)
     table.setLayoutData(layoutData)
@@ -224,6 +226,11 @@ object SwtUtils {
       }
     });
 
+    tableViewer.addDoubleClickListener(new IDoubleClickListener {
+      override def doubleClick(event: DoubleClickEvent) {
+        dblClick
+      }
+    })
     tableViewer
   }
 

@@ -155,7 +155,7 @@ class ScalastyleConfigurationDialog(parent: Shell, filename: String) extends Tit
     tableGridData.grabExcessHorizontalSpace = true
 
     tableViewer = table(checkerGroup, model, columns, new ModelContentProvider[ModelChecker](model),
-                        new PropertiesLabelProvider(columns), setSelection, refresh, layoutData = tableGridData)
+                        new PropertiesLabelProvider(columns), setSelection, refresh, editChecker(currentSelection), layoutData = tableGridData)
 
     editButton = button(contents, "Edit", false, { editChecker(currentSelection) })
 
