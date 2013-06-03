@@ -103,7 +103,7 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
     tableGridData.horizontalAlignment = GridData.FILL;
 
     tableViewer = table(configurationsGroup, model, columns, new ModelContentProvider(model),
-        new PropertiesLabelProvider(columns), setSelection, refresh, layoutData = tableGridData)
+        new PropertiesLabelProvider(columns), setSelection, refresh, editConfiguration(currentSelection), layoutData = tableGridData)
 
     val browseButton = button(configurationsGroup, "Browse/Add", true, {
       browseForFile(this.getShell(), "Select a scalastyle configuration file") match {
