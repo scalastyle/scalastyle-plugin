@@ -30,6 +30,9 @@ import org.eclipse.core.resources.IncrementalProjectBuilder
 import org.eclipse.core.resources.ResourcesPlugin
 import org.eclipse.core.runtime.IProgressMonitor
 import org.eclipse.ui.texteditor.MarkerUtilities
+
+import org.eclipse.jdt.core.JavaCore
+
 import org.scalastyle.scalastyleplugin.ExceptionUtils.handleException
 import org.scalastyle.scalastyleplugin.config.Persistence
 import org.scalastyle.scalastyleplugin.nature.ScalastyleNature
@@ -180,7 +183,10 @@ class ScalastyleBuilder extends JavaScalastyleBuilder {
 
 trait IFilter {
   def isEnabled(): Boolean = true
-  def accept(resource: IResource): Boolean = "scala" == resource.getFileExtension()
+  def accept(resource: IResource): Boolean = {
+    val prj = JavaCore.create(resource.getProject())
+    prj.isOnClasspath(resource) && "scala" == resource.getFileExtension()
+  }
 }
 
 class EclipseOutput extends Output[EclipseFileSpec] {
