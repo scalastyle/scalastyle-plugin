@@ -185,7 +185,9 @@ trait IFilter {
   def isEnabled(): Boolean = true
   def accept(resource: IResource): Boolean = {
     val prj = JavaCore.create(resource.getProject())
-    prj.isOnClasspath(resource) && "scala" == resource.getFileExtension()
+    prj.isOnClasspath(resource) && 
+      "scala" == resource.getFileExtension() && 
+      !resource.isDerived(IResource.CHECK_ANCESTORS)
   }
 }
 
