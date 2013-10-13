@@ -5,6 +5,14 @@ app="org.eclipse.equinox.p2.director"
 update_site="file:/C:/code/scalastyle/scalastyle-plugin/org.scalastyle.scalastyleplugin.update-site/target/site/"
 feature="org.scalastyle.scalastyleplugin.feature"
 
+kepler()
+{
+	eclipse_dir="/c/code/eclipse/kepler/eclipse"
+	
+	eclipse_repo="http://download.eclipse.org/releases/kepler/"
+	echo using kepler
+}
+
 juno()
 {
 	eclipse_dir="/c/code/eclipse/juno/eclipse"
@@ -58,6 +66,7 @@ case $1 in
 helios)	helios; shift;;
 indigo) indigo; shift;;
 juno) juno; shift;;
+kepler) kepler; shift;;
 *)	indigo;;
 esac
 
