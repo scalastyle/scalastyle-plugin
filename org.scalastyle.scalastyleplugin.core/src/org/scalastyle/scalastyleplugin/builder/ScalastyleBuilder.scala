@@ -64,17 +64,17 @@ object ScalastyleBuilder {
   private def workspace() = ResourcesPlugin.getWorkspace()
   private def root() = workspace.getRoot()
 
-  def buildProject(project: IProject) {
+  def buildProject(project: IProject): Unit = {
     val buildJob = BuildProjectJob(project, IncrementalProjectBuilder.FULL_BUILD)
     buildJob.setRule(ResourcesPlugin.getWorkspace().getRoot());
     buildJob.schedule();
   }
 
-  def buildAllProjects() {
+  def buildAllProjects(): Unit = {
     buildProjects(root().getProjects());
   }
 
-  def buildProjects(projects: Array[IProject]) {
+  def buildProjects(projects: Array[IProject]): Unit = {
     val scalastyleProjects = projects.filter(project => {
       project.exists() && project.isOpen() && project.hasNature(ScalastyleNature.NatureId) && Persistence.loadWorkspace().configurations.size > 0
     })
@@ -185,8 +185,8 @@ trait IFilter {
   def isEnabled(): Boolean = true
   def accept(resource: IResource): Boolean = {
     val prj = JavaCore.create(resource.getProject())
-    prj.isOnClasspath(resource) && 
-      "scala" == resource.getFileExtension() && 
+    prj.isOnClasspath(resource) &&
+      "scala" == resource.getFileExtension() &&
       !resource.isDerived(IResource.CHECK_ANCESTORS)
   }
 }

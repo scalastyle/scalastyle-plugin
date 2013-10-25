@@ -220,14 +220,14 @@ object SwtUtils {
     tableViewer.setContentProvider(contentProvider)
 
     table.addListener(SWT.Selection, new Listener() {
-      def handleEvent(event: Event) {
+      def handleEvent(event: Event): Unit = {
         val ss: StructuredSelection = tableViewer.getSelection().asInstanceOf[StructuredSelection];
         setSelection(ss.getFirstElement().asInstanceOf[T])
       }
     });
 
     tableViewer.addDoubleClickListener(new IDoubleClickListener {
-      override def doubleClick(event: DoubleClickEvent) {
+      override def doubleClick(event: DoubleClickEvent): Unit = {
         dblClick
       }
     })

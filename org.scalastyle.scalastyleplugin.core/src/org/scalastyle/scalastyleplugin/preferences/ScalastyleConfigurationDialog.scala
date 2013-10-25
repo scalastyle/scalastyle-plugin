@@ -61,7 +61,7 @@ case class ModelChecker(definitionChecker: DefinitionChecker, _configurationChec
   private[this] var configurationChecker = copyConfigurationChecker()
   var dirty = false
 
-  def set(level: Level, enabled: Boolean, parameters: Map[String, String], customMessage: Option[String], customId: Option[String]) {
+  def set(level: Level, enabled: Boolean, parameters: Map[String, String], customMessage: Option[String], customId: Option[String]): Unit = {
     configurationChecker = configurationChecker.copy(level = level, enabled = enabled, parameters = parameters,
         customMessage = customMessage, customId = customId)
     dirty = true

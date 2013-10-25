@@ -44,16 +44,16 @@ abstract class ScalastyleNatureAction extends IObjectActionDelegate {
   private var selectedProjects: Array[IProject] = _
   protected def job(projects: Array[IProject]): WorkspaceJob
 
-  def setActivePart(action: IAction, targetPart: IWorkbenchPart) { part = targetPart }
+  def setActivePart(action: IAction, targetPart: IWorkbenchPart): Unit = { part = targetPart }
 
-  def selectionChanged(action: IAction, selection: ISelection) {
+  def selectionChanged(action: IAction, selection: ISelection): Unit = {
     selection match {
       case s: IStructuredSelection => selectedProjects = s.toArray().map(_.asInstanceOf[IProject])
       case _ =>
     }
   }
 
-  def run(action: IAction) { job(selectedProjects).schedule() }
+  def run(action: IAction): Unit = { job(selectedProjects).schedule() }
 }
 
 // TODO when removing, the markers disappear. When adding, the project needs to get rebuilt. Ask?
