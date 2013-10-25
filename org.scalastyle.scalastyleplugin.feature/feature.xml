@@ -2,8 +2,7 @@
 <feature
       id="org.scalastyle.scalastyleplugin.feature"
       label="Scalastyle Plugin"
-      version="0.3.2">
-
+      version="0.3.3">
 
    <description url="https://github.com/scalastyle">
       Scalastyle is a style checker for Scala. It checks your Scala code against a number of configurable rules, and marks the code which violates these rules with warning or error markers in your source code.
