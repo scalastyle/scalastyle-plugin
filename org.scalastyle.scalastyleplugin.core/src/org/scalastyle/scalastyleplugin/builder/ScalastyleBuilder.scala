@@ -219,6 +219,7 @@ class EclipseOutput extends Output[EclipseFileSpec] {
     val severity = error.level match {
       case WarningLevel => IMarker.SEVERITY_WARNING
       case ErrorLevel => IMarker.SEVERITY_ERROR
+      case InfoLevel => IMarker.SEVERITY_INFO
       case _ => IMarker.SEVERITY_WARNING
     }
 

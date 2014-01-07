@@ -75,7 +75,7 @@ class ScalastyleCheckerDialog(parent: Shell, messageHelper: MessageHelper, model
     enabledCheckbox = checkbox(allContents, modelChecker.configurationChecker.enabled)
 
     label(allContents, "Severity")
-    severityCombo = combo(allContents, Array("warning", "error"), modelChecker.configurationChecker.level.name)
+    severityCombo = combo(allContents, Array("warning", "error", "info"), modelChecker.configurationChecker.level.name)
 
     label(allContents, "Custom Message")
     customMessageText = text(allContents, fromOption(modelChecker.configurationChecker.customMessage), true, false)
