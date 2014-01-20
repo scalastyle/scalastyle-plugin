@@ -43,6 +43,7 @@ import org.scalastyle.StyleError
 import org.scalastyle.EndFile
 import org.scalastyle.EndWork
 import org.scalastyle.ErrorLevel
+import org.scalastyle.InfoLevel
 import org.scalastyle.MessageHelper
 import org.scalastyle.Output
 import org.scalastyle.RealFileSpec
