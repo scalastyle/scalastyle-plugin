@@ -16,37 +16,32 @@
 
 package org.scalastyle.scalastyleplugin.preferences
 
-import org.eclipse.core.resources.IFile
-import org.eclipse.core.resources.IResource
-import org.eclipse.core.resources.ResourcesPlugin
-import org.eclipse.core.runtime.IStatus
-import org.eclipse.core.runtime.NullProgressMonitor
+import java.io.FileWriter
+import java.io.PrintWriter
+import java.util.Scanner
+
 import org.eclipse.core.runtime.Path
-import org.eclipse.core.runtime.Status
 import org.eclipse.jface.preference.PreferencePage
 import org.eclipse.jface.viewers.TableViewer
-import org.eclipse.jface.window.Window
+import org.eclipse.swt.SWT
 import org.eclipse.swt.layout.GridData
 import org.eclipse.swt.widgets.Button
 import org.eclipse.swt.widgets.Composite
 import org.eclipse.swt.widgets.Control
+import org.eclipse.swt.widgets.FileDialog
 import org.eclipse.swt.widgets.Shell
-import org.eclipse.swt.SWT
-import org.eclipse.ui.dialogs.ElementTreeSelectionDialog
-import org.eclipse.ui.dialogs.ISelectionStatusValidator
-import org.eclipse.ui.dialogs.SaveAsDialog
-import org.eclipse.ui.model.WorkbenchContentProvider
-import org.eclipse.ui.model.WorkbenchLabelProvider
 import org.eclipse.ui.IWorkbench
 import org.eclipse.ui.IWorkbenchPreferencePage
-import org.eclipse.ui.PlatformUI
+import org.scalastyle.MessageHelper
+import org.scalastyle.ScalastyleConfiguration
 import org.scalastyle.scalastyleplugin.ExceptionUtils.handleError
-import org.scalastyle.scalastyleplugin.SwtUtils.TableSorter
+import org.scalastyle.scalastyleplugin.ScalastylePlugin
 import org.scalastyle.scalastyleplugin.SwtUtils.Container
 import org.scalastyle.scalastyleplugin.SwtUtils.DialogColumn
 import org.scalastyle.scalastyleplugin.SwtUtils.ModelContentProvider
 import org.scalastyle.scalastyleplugin.SwtUtils.PropertiesLabelProvider
 import org.scalastyle.scalastyleplugin.SwtUtils.TableLine
+import org.scalastyle.scalastyleplugin.SwtUtils.TableSorter
 import org.scalastyle.scalastyleplugin.SwtUtils.button
 import org.scalastyle.scalastyleplugin.SwtUtils.composite
 import org.scalastyle.scalastyleplugin.SwtUtils.gridData
@@ -56,9 +51,6 @@ import org.scalastyle.scalastyleplugin.SwtUtils.table
 import org.scalastyle.scalastyleplugin.config.Persistence
 import org.scalastyle.scalastyleplugin.config.WorkspaceConfiguration
 import org.scalastyle.scalastyleplugin.config.WorkspaceConfigurations
-import org.scalastyle.scalastyleplugin.ScalastylePlugin
-import org.scalastyle.MessageHelper
-import org.scalastyle.ScalastyleConfiguration
 
 case class Configuration(location: String) extends TableLine
 
@@ -106,14 +98,11 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
         new PropertiesLabelProvider(columns), setSelection, refresh, editConfiguration(currentSelection), layoutData = tableGridData)
 
     val browseButton = button(configurationsGroup, "Browse/Add", true, {
-      browseForFile(this.getShell(), "Select a scalastyle configuration file") match {
-        case Some(file) => addConfiguration(file)
-        case None =>
-      }
+      browseForFile(this.getShell(), "Select a scalastyle configuration file") foreach addConfiguration
     })
 
     val newButton = button(configurationsGroup, "New", true, {
-      createNewConfiguration();
+      browseForNewFile(getShell(), "Select a file to create with the default configuration") foreach createNewConfiguration
     })
 
     editButton = button(configurationsGroup, "Edit", false, {
@@ -127,42 +116,43 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
     parentComposite
   }
 
-  private[this] def createNewConfiguration(): Unit = {
-    val root = ResourcesPlugin.getWorkspace().getRoot()
-    browseForNewFile(getShell(), "Select a file to create with the default configuration") match {
-      case Some(path) => {
-        val dfile = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
-        dfile.create(classLoader.getResourceAsStream(ScalastyleConfiguration.DefaultConfiguration), true, new NullProgressMonitor())
+  private[this] def createNewConfiguration(fileName: String): Unit = {
+    val path = Path.fromOSString(fileName)
+    val config = classLoader.getResourceAsStream(ScalastyleConfiguration.DefaultConfiguration)
+    val printer = new PrintWriter(new FileWriter(fileName, false))
+    val scanner = new Scanner(config).useDelimiter("\0")
+    printer.append(scanner.next())
+    printer.close()
+    scanner.close()
 
-        dfile.refreshLocal(IResource.DEPTH_ZERO, null)
-
-        addConfiguration(dfile)
-      }
-      case None =>
-    }
+    addConfiguration(fileName)
   }
 
-  private[this] def browseForNewFile(shell: Shell, title: String): Option[Path] = {
-    val dialog = new SaveAsDialog(shell);
-    //    dialog.setTitle(title)
-    //    dialog.setMessage(title)
-    dialog.setOriginalName("scalastyle_configuration.xml")
+  private[this] def browseForNewFile(shell: Shell, title: String): Option[String] = {
+    val workspacePathName = ScalastylePlugin.getWorkspace().getRoot().getLocation().toOSString()
+    val dialog = new FileDialog(getShell(), SWT.SAVE)
+    dialog.setText(title)
+    dialog.setFilterPath(workspacePathName)
+    dialog.setFileName("scalastyle_configuration.xml")
+    dialog.setOverwrite(true)
 
-    dialog.setBlockOnOpen(true)
-
-    if (Window.OK == dialog.open()) {
-      val result = dialog.getResult();
-      val checkFile = result.asInstanceOf[Path];
-      Some(checkFile)
-    } else {
-      None
-    }
+    Option(dialog.open())
   }
 
+  private[this] def browseForFile(shell: Shell, title: String): Option[String] = {
+    val dialog = new FileDialog(getShell(), SWT.OPEN)
+    dialog.setText(title)
+    dialog.setFilterExtensions(Array("*.xml", "*.*"))
+    dialog.setFilterNames(Array("XML Files", "All Files (*)"))
 
-  private[this] def addConfiguration(file: IFile) = {
-    model.elements = model.elements ::: List(Configuration(file.getFullPath().toString()))
-    refresh()
+    Option(dialog.open())
+  }
+
+  private[this] def addConfiguration(fileName: String) = {
+    if (!model.elements.exists(_.location == fileName)) {
+      model.elements :+= Configuration(fileName)
+      refresh()
+    }
   }
 
   private[this] def removeConfiguration(configuration: Configuration) = {
@@ -186,36 +176,6 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
 
   def refresh(): Unit = {
     tableViewer.refresh(true, true)
-  }
-
-  private[this] def browseForFile(shell: Shell, title: String): Option[IFile] = {
-    val dialog = new ElementTreeSelectionDialog(shell, new WorkbenchLabelProvider(), new WorkbenchContentProvider());
-    dialog.setTitle(title)
-    dialog.setMessage(title)
-    dialog.setBlockOnOpen(true)
-    dialog.setAllowMultiple(false)
-    // TODO add initial selection
-    //    val initial = file match {
-    //      case Some(name) => name
-    //      case None => null
-    //    }
-    //    dialog.setInitialSelection(initial)
-    dialog.setInput(ScalastylePlugin.getWorkspace().getRoot())
-
-    dialog.setValidator(new ISelectionStatusValidator() {
-      def validate(selection: Array[Object]): IStatus = {
-        val valid = selection.length == 1 && selection(0).isInstanceOf[IFile]
-        new Status(if (valid) IStatus.OK else IStatus.ERROR, PlatformUI.PLUGIN_ID, IStatus.ERROR, "", null)
-      }
-    });
-
-    if (Window.OK == dialog.open()) {
-      val result = dialog.getResult();
-      val checkFile = result(0).asInstanceOf[IFile];
-      Some(checkFile)
-    } else {
-      None
-    }
   }
 
   def init(workbench: IWorkbench): Unit = {}

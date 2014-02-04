@@ -23,13 +23,13 @@ import scala.xml.Node
 import scala.xml.Null
 import scala.xml.Text
 import scala.xml.XML
-
 import org.eclipse.core.resources.IProject
 import org.eclipse.core.resources.ResourcesPlugin
 import org.scalastyle.scalastyleplugin.StringUtils.isEmpty
 import org.scalastyle.scalastyleplugin.ScalastylePlugin
 import org.scalastyle.ScalastyleConfiguration
 import org.scalastyle.XmlPrettyPrinter
+import java.io.File
 
 case class WorkspaceConfiguration(file: String)
 case class WorkspaceConfigurations(configurations: List[WorkspaceConfiguration])
@@ -119,13 +119,9 @@ object Persistence {
     write(filename, ScalastyleConfiguration.toXml(scalastyleConfiguration), xmlWidth, xmlStep)
   }
 
-  def findConfiguration(file: String): Option[java.io.File] = {
-    val resource = ResourcesPlugin.getWorkspace().getRoot().findMember(file)
-    if (resource != null) {
-      Some(resource.getLocation().toFile())
-    } else {
-      None
-    }
+  def findConfiguration(file: String): Option[File] = {
+    val f = new File(file)
+    if (f.exists()) Some(f) else None
   }
 
   // TODO change filename to an IFile?
