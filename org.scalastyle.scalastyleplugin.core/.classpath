@@ -7,6 +7,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="lib/scalariform_2.10-0.1.4.jar"/>
 	<classpathentry kind="lib" path="lib/scala-library-2.10.0.jar"/>
-	<classpathentry kind="lib" path="lib/scalastyle_2.10-0.3.3-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/scalastyle_2.10-0.4.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
