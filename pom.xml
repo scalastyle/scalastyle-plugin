@@ -18,7 +18,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <miglayout.version>3.7.4</miglayout.version>
     <log4j.version>1.2.16</log4j.version>
-    <tycho.version>0.15.0</tycho.version>
+    <tycho.version>0.18.1</tycho.version>
     <scala.version>2.10.0</scala.version>
 
     <scalastyle.artifactId>scalastyle_2.10</scalastyle.artifactId>
@@ -143,6 +143,13 @@
 
 
   <profiles>
+    <profile>
+      <id>kepler</id>
+      <properties>
+        <eclipse.codename>kepler</eclipse.codename>
+        <repo.eclipse>http://download.eclipse.org/releases/kepler/</repo.eclipse>
+      </properties>
+    </profile>
     <profile>
       <id>juno</id>
       <properties>
