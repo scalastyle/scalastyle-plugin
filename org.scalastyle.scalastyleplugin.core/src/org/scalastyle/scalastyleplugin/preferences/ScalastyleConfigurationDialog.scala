@@ -53,6 +53,7 @@ import org.scalastyle.MessageHelper
 import org.scalastyle.ParameterType
 import org.scalastyle.ScalastyleConfiguration
 import org.scalastyle.ScalastyleDefinition
+import com.typesafe.config.ConfigFactory
 
 // scalastyle:off magic.number
 
@@ -116,7 +117,7 @@ class ScalastyleConfigurationDialog(parent: Shell, filename: String) extends Tit
   val file = Persistence.findConfiguration(filename)
   val configuration = ScalastyleConfiguration.readFromXml(file.get.getAbsolutePath())
   val model = new Model(definition, configuration)
-  val messageHelper = new MessageHelper(classLoader)
+  val messageHelper = new MessageHelper(ConfigFactory.load())
   var nameText: Text = _
   var enableCommentFilterButton: Button = _
   var editButton: Button = _

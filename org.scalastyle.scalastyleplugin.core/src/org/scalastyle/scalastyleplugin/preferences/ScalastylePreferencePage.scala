@@ -59,6 +59,7 @@ import org.scalastyle.scalastyleplugin.config.WorkspaceConfigurations
 import org.scalastyle.scalastyleplugin.ScalastylePlugin
 import org.scalastyle.MessageHelper
 import org.scalastyle.ScalastyleConfiguration
+import com.typesafe.config.ConfigFactory
 
 case class Configuration(location: String) extends TableLine
 
@@ -69,7 +70,7 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
 
   val LocationSorter = new TableSorter[Configuration, String](_.location, true)
   val classLoader = this.getClass().getClassLoader()
-  val messageHelper = new MessageHelper(classLoader)
+  val messageHelper = new MessageHelper(ConfigFactory.load())
   val model = toConfigurations(Persistence.loadWorkspace())
 
   var editButton: Button = _

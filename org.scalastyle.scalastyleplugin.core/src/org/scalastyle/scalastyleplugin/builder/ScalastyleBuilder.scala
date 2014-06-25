@@ -20,7 +20,6 @@ import scala.Array.canBuildFrom
 import scala.Option.option2Iterable
 import scala.collection.JavaConversions.mutableMapAsJavaMap
 import scala.collection.mutable.HashMap
-
 import org.eclipse.core.resources.IContainer
 import org.eclipse.core.resources.IMarker
 import org.eclipse.core.resources.IProject
@@ -30,9 +29,7 @@ import org.eclipse.core.resources.IncrementalProjectBuilder
 import org.eclipse.core.resources.ResourcesPlugin
 import org.eclipse.core.runtime.IProgressMonitor
 import org.eclipse.ui.texteditor.MarkerUtilities
-
 import org.eclipse.jdt.core.JavaCore
-
 import org.scalastyle.scalastyleplugin.ExceptionUtils.handleException
 import org.scalastyle.scalastyleplugin.config.Persistence
 import org.scalastyle.scalastyleplugin.nature.ScalastyleNature
@@ -53,9 +50,9 @@ import org.scalastyle.StartFile
 import org.scalastyle.StartWork
 import org.scalastyle.StyleException
 import org.scalastyle.WarningLevel
-
 import ScalastyleBuilder.createMarker
 import ScalastyleBuilder.root
+import com.typesafe.config.ConfigFactory
 
 class EclipseFileSpec(name: String, encoding: String, val resource: IResource) extends RealFileSpec(name, Some(encoding))
 
@@ -194,7 +191,7 @@ trait IFilter {
 
 class EclipseOutput extends Output[EclipseFileSpec] {
 
-  private val messageHelper = new MessageHelper(this.getClass().getClassLoader())
+  private val messageHelper = new MessageHelper(ConfigFactory.load())
 
   override def message(m: Message[EclipseFileSpec]): Unit = m match {
     case StartWork() => {}
@@ -224,7 +221,7 @@ class EclipseOutput extends Output[EclipseFileSpec] {
       case _ => IMarker.SEVERITY_WARNING
     }
 
-    val message = Output.findMessage(messageHelper, error.clazz, error.key, error.args, error.customMessage)
+    val message = Output.findMessage(messageHelper, error.key, error.args, error.customMessage)
     createMarker(error.fileSpec.resource, error.key, severity, Some(error.lineNumber.getOrElse(1)), message)
   }
 }

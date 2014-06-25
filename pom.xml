@@ -10,7 +10,7 @@
   </parent>
   <groupId>org.scalastyle</groupId>
   <artifactId>org.scalastyle.scalastyleplugin</artifactId>
-  <version>0.4.0</version>
+  <version>0.5.0</version>
   <packaging>pom</packaging>
   <description>Scalastyle Eclipse plugin</description>
 
@@ -22,7 +22,7 @@
     <scala.version>2.10.0</scala.version>
 
     <scalastyle.artifactId>scalastyle_2.10</scalastyle.artifactId>
-    <scalastyle.version>0.4.0</scalastyle.version>
+    <scalastyle.version>0.5.0</scalastyle.version>
 
     <scalariform.artifactId>scalariform_2.10</scalariform.artifactId>
     <scalariform.version>0.1.4</scalariform.version>
@@ -145,6 +145,9 @@
   <profiles>
     <profile>
       <id>kepler</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <properties>
         <eclipse.codename>kepler</eclipse.codename>
         <repo.eclipse>http://download.eclipse.org/releases/kepler/</repo.eclipse>
@@ -166,9 +169,6 @@
     </profile>
     <profile>
       <id>indigo</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
       <properties>
         <eclipse.codename>indigo</eclipse.codename>
         <repo.eclipse>http://download.eclipse.org/releases/indigo/</repo.eclipse>
