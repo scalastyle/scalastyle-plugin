@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scalastyle Plugin
 Bundle-SymbolicName: org.scalastyle.scalastyleplugin.core; singleton:=true
-Bundle-Version: 0.5.0
+Bundle-Version: 0.6.0.qualifier
 Bundle-Activator: org.scalastyle.scalastyleplugin.ScalastylePlugin
 Bundle-Vendor: Scalastyle
 Bundle-Localization: plugin
@@ -20,7 +20,7 @@ Require-Bundle: org.eclipse.ui,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/scalariform_2.10-0.1.4.jar,
- lib/scalastyle_2.10-0.5.0.jar,
+ lib/scalastyle_2.10-0.6.0-SNAPSHOT.jar,
  lib/scala-library-2.10.0.jar,
  lib/config-1.2.0.jar,
  .,
