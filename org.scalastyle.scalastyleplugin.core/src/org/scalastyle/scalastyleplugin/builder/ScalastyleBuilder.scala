@@ -53,6 +53,7 @@ import org.scalastyle.WarningLevel
 import ScalastyleBuilder.createMarker
 import ScalastyleBuilder.root
 import com.typesafe.config.ConfigFactory
+import java.io.File
 
 class EclipseFileSpec(name: String, encoding: String, val resource: IResource) extends RealFileSpec(name, Some(encoding))
 
@@ -155,9 +156,23 @@ class ScalastyleBuilder extends JavaScalastyleBuilder {
     }
   }
 
-  private def fileSpec(r: IResource) = new EclipseFileSpec(r.getLocation().toFile().getAbsolutePath(),
-                                                          root().getFileForLocation(r.getLocation()).getCharset(),
-                                                          r)
+  private def fileSpec(r: IResource) = {
+    val l = r.getLocation()
+    val p = l.toFile().getAbsolutePath()
+    var rr = root().getFileForLocation(l)
+    // rr may be null for files included through a linked resource.
+    if (rr == null) {
+      val u = new File(p).toURI()
+      val files = root().findFilesForLocationURI(u)
+      if (files.length == 1) {
+        rr = files.head
+      } else {
+        throw ScalastylePluginException("cannot find single file " + files.mkString(", "))     
+      }
+    }
+    val c = rr.getCharset()
+    new EclipseFileSpec(p, rr.getCharset(), r)
+  }
 
   private def isDeltaAddedOrChanged(delta: IResourceDelta) = (delta.getKind() == IResourceDelta.ADDED) || (delta.getKind() == IResourceDelta.CHANGED)
 
