@@ -20,21 +20,29 @@ import org.eclipse.jface.dialogs.MessageDialog
 import org.eclipse.jface.dialogs.TitleAreaDialog
 import org.eclipse.jface.viewers.TableViewer
 import org.eclipse.jface.window.Window
+import org.eclipse.swt.SWT
 import org.eclipse.swt.layout.GridData
 import org.eclipse.swt.widgets.Button
 import org.eclipse.swt.widgets.Composite
 import org.eclipse.swt.widgets.Control
 import org.eclipse.swt.widgets.Shell
 import org.eclipse.swt.widgets.Text
-import org.eclipse.swt.SWT
+import org.scalastyle.ConfigurationChecker
+import org.scalastyle.DefinitionChecker
+import org.scalastyle.Level
+import org.scalastyle.MessageHelper
+import org.scalastyle.ParameterType
+import org.scalastyle.ScalastyleConfiguration
+import org.scalastyle.ScalastyleDefinition
 import org.scalastyle.scalastyleplugin.ExceptionUtils.handleError
+import org.scalastyle.scalastyleplugin.ScalastylePlugin
 import org.scalastyle.scalastyleplugin.StringUtils.isEmpty
-import org.scalastyle.scalastyleplugin.SwtUtils.ModelContentProvider
-import org.scalastyle.scalastyleplugin.SwtUtils.TableSorter
 import org.scalastyle.scalastyleplugin.SwtUtils.Container
 import org.scalastyle.scalastyleplugin.SwtUtils.DialogColumn
+import org.scalastyle.scalastyleplugin.SwtUtils.ModelContentProvider
 import org.scalastyle.scalastyleplugin.SwtUtils.PropertiesLabelProvider
 import org.scalastyle.scalastyleplugin.SwtUtils.TableLine
+import org.scalastyle.scalastyleplugin.SwtUtils.TableSorter
 import org.scalastyle.scalastyleplugin.SwtUtils.button
 import org.scalastyle.scalastyleplugin.SwtUtils.checkbox
 import org.scalastyle.scalastyleplugin.SwtUtils.composite
@@ -45,14 +53,7 @@ import org.scalastyle.scalastyleplugin.SwtUtils.label
 import org.scalastyle.scalastyleplugin.SwtUtils.table
 import org.scalastyle.scalastyleplugin.SwtUtils.text
 import org.scalastyle.scalastyleplugin.config.Persistence
-import org.scalastyle.scalastyleplugin.ScalastylePlugin
-import org.scalastyle.ConfigurationChecker
-import org.scalastyle.DefinitionChecker
-import org.scalastyle.Level
-import org.scalastyle.MessageHelper
-import org.scalastyle.ParameterType
-import org.scalastyle.ScalastyleConfiguration
-import org.scalastyle.ScalastyleDefinition
+
 import com.typesafe.config.ConfigFactory
 
 // scalastyle:off magic.number
@@ -117,7 +118,7 @@ class ScalastyleConfigurationDialog(parent: Shell, filename: String) extends Tit
   val file = Persistence.findConfiguration(filename)
   val configuration = ScalastyleConfiguration.readFromXml(file.get.getAbsolutePath())
   val model = new Model(definition, configuration)
-  val messageHelper = new MessageHelper(ConfigFactory.load())
+  val messageHelper = new MessageHelper(ConfigFactory.parseResources("reference.conf"))
   var nameText: Text = _
   var enableCommentFilterButton: Button = _
   var editButton: Button = _

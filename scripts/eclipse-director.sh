@@ -13,27 +13,12 @@ kepler()
 	echo using kepler
 }
 
-juno()
+luna()
 {
-	eclipse_dir="/c/code/eclipse/juno/eclipse"
+	eclipse_dir="/home/mfarwell/dev/luna"
 	
-	eclipse_repo="http://download.eclipse.org/releases/juno/"
-	echo using juno
-}
-
-indigo()
-{
-	eclipse_dir="/c/code/eclipse/eclipse-jee-indigo-SR2-win32-x86_64/eclipse"
-	
-	eclipse_repo="http://download.eclipse.org/releases/indigo/"
-	echo using indigo
-}
-
-helios()
-{
-	eclipse_dir="/c/code/eclipse/eclipse-jee-helios-SR2-win32-scala/eclipse"
-	eclipse_repo="http://download.eclipse.org/releases/helios/"
-	echo using helios
+	eclipse_repo="http://download.eclipse.org/releases/luna/"
+	echo using luna
 }
 
 usage()
@@ -63,11 +48,9 @@ uninstall()
 }
 
 case $1 in
-helios)	helios; shift;;
-indigo)	indigo; shift;;
-juno)	juno; shift;;
+luna)	luna; shift;;
 kepler) kepler; shift;;
-*)	indigo;;
+*)	luna;;
 esac
 
 case $1 in 

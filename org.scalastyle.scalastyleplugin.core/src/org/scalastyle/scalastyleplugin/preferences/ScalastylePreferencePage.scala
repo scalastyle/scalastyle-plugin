@@ -26,27 +26,30 @@ import org.eclipse.core.runtime.Status
 import org.eclipse.jface.preference.PreferencePage
 import org.eclipse.jface.viewers.TableViewer
 import org.eclipse.jface.window.Window
+import org.eclipse.swt.SWT
 import org.eclipse.swt.layout.GridData
 import org.eclipse.swt.widgets.Button
 import org.eclipse.swt.widgets.Composite
 import org.eclipse.swt.widgets.Control
 import org.eclipse.swt.widgets.Shell
-import org.eclipse.swt.SWT
+import org.eclipse.ui.IWorkbench
+import org.eclipse.ui.IWorkbenchPreferencePage
+import org.eclipse.ui.PlatformUI
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog
 import org.eclipse.ui.dialogs.ISelectionStatusValidator
 import org.eclipse.ui.dialogs.SaveAsDialog
 import org.eclipse.ui.model.WorkbenchContentProvider
 import org.eclipse.ui.model.WorkbenchLabelProvider
-import org.eclipse.ui.IWorkbench
-import org.eclipse.ui.IWorkbenchPreferencePage
-import org.eclipse.ui.PlatformUI
+import org.scalastyle.MessageHelper
+import org.scalastyle.ScalastyleConfiguration
 import org.scalastyle.scalastyleplugin.ExceptionUtils.handleError
-import org.scalastyle.scalastyleplugin.SwtUtils.TableSorter
+import org.scalastyle.scalastyleplugin.ScalastylePlugin
 import org.scalastyle.scalastyleplugin.SwtUtils.Container
 import org.scalastyle.scalastyleplugin.SwtUtils.DialogColumn
 import org.scalastyle.scalastyleplugin.SwtUtils.ModelContentProvider
 import org.scalastyle.scalastyleplugin.SwtUtils.PropertiesLabelProvider
 import org.scalastyle.scalastyleplugin.SwtUtils.TableLine
+import org.scalastyle.scalastyleplugin.SwtUtils.TableSorter
 import org.scalastyle.scalastyleplugin.SwtUtils.button
 import org.scalastyle.scalastyleplugin.SwtUtils.composite
 import org.scalastyle.scalastyleplugin.SwtUtils.gridData
@@ -56,9 +59,7 @@ import org.scalastyle.scalastyleplugin.SwtUtils.table
 import org.scalastyle.scalastyleplugin.config.Persistence
 import org.scalastyle.scalastyleplugin.config.WorkspaceConfiguration
 import org.scalastyle.scalastyleplugin.config.WorkspaceConfigurations
-import org.scalastyle.scalastyleplugin.ScalastylePlugin
-import org.scalastyle.MessageHelper
-import org.scalastyle.ScalastyleConfiguration
+
 import com.typesafe.config.ConfigFactory
 
 case class Configuration(location: String) extends TableLine
@@ -70,7 +71,7 @@ class ScalastylePreferencePage extends PreferencePage with IWorkbenchPreferenceP
 
   val LocationSorter = new TableSorter[Configuration, String](_.location, true)
   val classLoader = this.getClass().getClassLoader()
-  val messageHelper = new MessageHelper(ConfigFactory.load())
+  val messageHelper = new MessageHelper(ConfigFactory.parseResources("reference.conf"))
   val model = toConfigurations(Persistence.loadWorkspace())
 
   var editButton: Button = _

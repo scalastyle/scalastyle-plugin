@@ -10,7 +10,7 @@
   </parent>
   <groupId>org.scalastyle</groupId>
   <artifactId>org.scalastyle.scalastyleplugin</artifactId>
-  <version>0.7.0-SNAPSHOT</version>
+  <version>0.6.0</version>
   <packaging>pom</packaging>
   <description>Scalastyle Eclipse plugin</description>
 
@@ -143,6 +143,16 @@
 
 
   <profiles>
+    <profile>
+      <id>luna</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <eclipse.codename>luna</eclipse.codename>
+        <repo.eclipse>http://download.eclipse.org/releases/luna/</repo.eclipse>
+      </properties>
+    </profile>
     <profile>
       <id>kepler</id>
       <activation>

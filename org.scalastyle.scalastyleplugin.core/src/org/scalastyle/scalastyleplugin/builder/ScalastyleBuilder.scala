@@ -53,6 +53,10 @@ import org.scalastyle.WarningLevel
 import ScalastyleBuilder.createMarker
 import ScalastyleBuilder.root
 import com.typesafe.config.ConfigFactory
+import com.typesafe.config.ConfigParseOptions
+import java.io.FileOutputStream
+import java.io.File
+import java.io.PrintStream
 
 class EclipseFileSpec(name: String, encoding: String, val resource: IResource) extends RealFileSpec(name, Some(encoding))
 
@@ -190,8 +194,14 @@ trait IFilter {
 }
 
 class EclipseOutput extends Output[EclipseFileSpec] {
+  val c = ConfigFactory.parseResources("reference.conf")
 
-  private val messageHelper = new MessageHelper(ConfigFactory.load())
+  {
+    val f = new PrintStream(new FileOutputStream(new File("/tmp/file.txt")))
+    f.println("config=" + c.root().render())
+    f.close();
+  }
+  private val messageHelper = new MessageHelper(c)
 
   override def message(m: Message[EclipseFileSpec]): Unit = m match {
     case StartWork() => {}
