@@ -61,7 +61,7 @@ import java.io.PrintStream
 class EclipseFileSpec(name: String, encoding: String, val resource: IResource) extends RealFileSpec(name, Some(encoding))
 
 object ScalastyleBuilder {
-  val BuilderId = ScalastylePlugin.PluginId + ".ScalastyleBuilder" //$NON-NLS-1$
+  val BuilderId = ScalastylePlugin.PluginId + ".ScalastyleBuilder" // $NON-NLS-1$
 
   private def workspace() = ResourcesPlugin.getWorkspace()
   private def root() = workspace.getRoot()
@@ -195,12 +195,6 @@ trait IFilter {
 
 class EclipseOutput extends Output[EclipseFileSpec] {
   val c = ConfigFactory.parseResources("reference.conf")
-
-  {
-    val f = new PrintStream(new FileOutputStream(new File("/tmp/file.txt")))
-    f.println("config=" + c.root().render())
-    f.close();
-  }
   private val messageHelper = new MessageHelper(c)
 
   override def message(m: Message[EclipseFileSpec]): Unit = m match {
