@@ -10,7 +10,7 @@
   </parent>
   <groupId>org.scalastyle</groupId>
   <artifactId>org.scalastyle.scalastyleplugin</artifactId>
-  <version>0.7.0</version>
+  <version>0.8.0</version>
   <packaging>pom</packaging>
   <description>Scalastyle Eclipse plugin</description>
 
@@ -23,10 +23,10 @@
     <scala.version>${scala.base}.4</scala.version>
 
     <scalastyle.artifactId>scalastyle_${scala.base}</scalastyle.artifactId>
-    <scalastyle.version>0.7.0</scalastyle.version>
+    <scalastyle.version>0.8.0</scalastyle.version>
 
     <scalariform.artifactId>scalariform_${scala.base}</scalariform.artifactId>
-    <scalariform.version>0.1.5</scalariform.version>
+    <scalariform.version>0.1.7</scalariform.version>
 
     <plugin.version>${project.version}</plugin.version>
     <plugin.id>${project.groupId}.${project.artifactId}</plugin.id>

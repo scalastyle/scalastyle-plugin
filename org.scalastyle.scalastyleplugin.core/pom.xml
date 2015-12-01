@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.scalastyle</groupId>
     <artifactId>org.scalastyle.scalastyleplugin</artifactId>
-    <version>0.7.0</version>
+    <version>0.8.0</version>
   </parent>
   <artifactId>org.scalastyle.scalastyleplugin.core</artifactId>
   <packaging>eclipse-plugin</packaging>
@@ -124,7 +124,7 @@
                   <overWrite>true</overWrite>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>com.danieltrinh</groupId>
+                  <groupId>org.scalariform</groupId>
                   <artifactId>${scalariform.artifactId}</artifactId>
                   <version>${scalariform.version}</version>
                   <outputDirectory>${basedir}/lib</outputDirectory>
