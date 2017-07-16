@@ -23,7 +23,7 @@
     <scala.version>${scala.base}.6</scala.version>
 
     <scalastyle.artifactId>scalastyle_${scala.base}</scalastyle.artifactId>
-    <scalastyle.version>0.9.0-SNAPSHOT</scalastyle.version>
+    <scalastyle.version>0.9.0</scalastyle.version>
 
     <scalariform.artifactId>scalariform_${scala.base}</scalariform.artifactId>
     <scalariform.version>0.2.0</scalariform.version>
